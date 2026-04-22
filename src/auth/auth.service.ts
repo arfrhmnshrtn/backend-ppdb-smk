@@ -1,4 +1,11 @@
-import { HttpStatus, Injectable, UnauthorizedException, HttpException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+  HttpException,
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
 import { RegisterAuthDto } from './dto/register-auth.dto.js';
 import { PrismaService } from '../lib/prisma.service.js';
 import { LoginAuthDto } from './dto/login-auth.dto.js';
@@ -14,7 +21,7 @@ export class AuthService {
   async register(registerAuthDto: RegisterAuthDto) {
     try {
       const { name, email, password } = registerAuthDto;
-      
+
       const existingUser = await this.prisma.user.findUnique({
         where: { email },
       });
@@ -23,7 +30,7 @@ export class AuthService {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      
+
       await this.prisma.user.create({
         data: {
           name,
@@ -31,10 +38,10 @@ export class AuthService {
           password: hashedPassword,
         },
       });
-      
+
       return {
         status: true,
-        message: 'Pendaftaran berhasil'
+        message: 'Pendaftaran berhasil',
       };
     } catch (error) {
       if (error instanceof HttpException) {
@@ -42,7 +49,9 @@ export class AuthService {
       }
       throw new InternalServerErrorException({
         status: false,
-        message: 'Pendaftaran gagal: ' + (error instanceof Error ? error.message : String(error)),
+        message:
+          'Pendaftaran gagal: ' +
+          (error instanceof Error ? error.message : String(error)),
       });
     }
   }
@@ -84,7 +93,9 @@ export class AuthService {
       }
       throw new InternalServerErrorException({
         status: false,
-        message: 'Login gagal: ' + (error instanceof Error ? error.message : String(error)),
+        message:
+          'Login gagal: ' +
+          (error instanceof Error ? error.message : String(error)),
       });
     }
   }
