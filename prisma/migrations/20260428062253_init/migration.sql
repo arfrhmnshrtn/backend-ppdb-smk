@@ -1,0 +1,2 @@
+-- AddForeignKey
+ALTER TABLE `Berkas` ADD CONSTRAINT `Berkas_idUser_fkey` FOREIGN KEY (`idUser`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

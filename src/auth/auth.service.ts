@@ -16,8 +16,8 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   private readonly prisma = PrismaService;
 
-  constructor(private jwtService: JwtService) { }
-  
+  constructor(private jwtService: JwtService) {}
+
   // register user
   async register(registerAuthDto: RegisterAuthDto) {
     try {
@@ -107,7 +107,7 @@ export class AuthService {
         },
       });
 
-      if(user?.role !== 'USER') {
+      if (user?.role !== 'USER') {
         throw new UnauthorizedException('Email atau password salah');
       }
 
@@ -156,7 +156,7 @@ export class AuthService {
         },
       });
 
-      if(user?.role !== 'ADMIN') {
+      if (user?.role !== 'ADMIN') {
         throw new UnauthorizedException('Email atau password salah');
       }
 

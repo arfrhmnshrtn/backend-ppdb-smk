@@ -19,10 +19,56 @@ model User {
   password  String
   role      Role     @default(USER)
   createdAt DateTime @default(now())
+
+  berkas Berkas[]
+
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+model Berkas {
+  id        Int      @id @default(autoincrement())
+  no_daftar String
+  nama      String
+  no_hp     String
+  nisn      String
+  asal_sekolah String
+  alamat    String
+  jurusan   Jurusan
+  surat_keterangan_lulus String
+  raport String
+  ktp_ayah String?
+  ktp_ibu String?
+  kartu_keluarga String
+  akta_kelahiran String
+  pas_foto String
+  sptjm String
+  kip String?
+  paiagam String?
+  sk_osis String?
+  sk_pramuka String?
+  status_berkas StatusBerkas @default(PENDING)
+  // idUser User @relation(fields: [idUser], references: [id])
+  user User @relation(fields: [idUser], references: [id])
+  idUser Int
+  createdAt DateTime @default(now())
+}
+
+enum Jurusan {
+  TKJ
+  TKR
+  ATP
+  AK
+  DKV
+}
+
+enum StatusBerkas {
+  PENDING
+  APPROVED
+  REVISI
+  REJECTED
 }
 
