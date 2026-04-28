@@ -2,11 +2,6 @@ import { IsString, IsOptional, IsEnum } from 'class-validator';
 import { Jurusan } from '../../../generated/prisma/enums';
 
 export class CreateUploadFileDto {
-  @IsString()
-  idUser!: string; // From FormData, it will be a string, we parse it later
-
-  @IsString()
-  no_daftar!: string;
 
   @IsString()
   nama!: string;

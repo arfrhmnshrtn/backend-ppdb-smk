@@ -12,11 +12,13 @@ import { CreateUploadFileDto } from './dto/create-upload-file.dto';
 import { UpdateUploadFileDto } from './dto/update-upload-file.dto';
 import * as fs from 'fs';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { UseInterceptors, UploadedFiles, UseGuards, Req } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { AuthGuard } from '../auth/auth.guard';
+import { CleanUploadedFilesInterceptor } from '../common/interceptors/file-cleanup.interceptor';
 
 const uploadPath = './uploads';
 
@@ -29,7 +31,9 @@ export class UploadFileController {
   constructor(private readonly uploadFileService: UploadFileService) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   @UseInterceptors(
+    CleanUploadedFilesInterceptor,
     FileFieldsInterceptor(
       [
         { name: 'surat_keterangan_lulus', maxCount: 1 },
@@ -47,9 +51,10 @@ export class UploadFileController {
       ],
       {
         storage: diskStorage({
-          destination: (req, file, cb) => {
-            // buat folder lagi sesuai id user
-            const folderPath = `${uploadPath}/${req.body.idUser}`;
+          destination: (req: any, file, cb) => {
+            // buat folder lagi sesuai id user (dari JWT payload)
+            const userId = req.user?.sub;
+            const folderPath = `${uploadPath}/${userId}`;
             if (!fs.existsSync(folderPath)) {
               fs.mkdirSync(folderPath);
             }
@@ -65,6 +70,7 @@ export class UploadFileController {
     ),
   )
   uploadFile(
+    @Req() req: any,
     @Body() dto: CreateUploadFileDto,
     @UploadedFiles()
     files: {
@@ -82,7 +88,7 @@ export class UploadFileController {
       sk_pramuka?: Express.Multer.File[];
     },
   ) {
-
-    return this.uploadFileService.uploadFile(dto, files);
+    const userId = req.user?.sub;
+    return this.uploadFileService.uploadFile(dto, files, userId);
   }
 }

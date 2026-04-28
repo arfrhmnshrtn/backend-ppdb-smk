@@ -24,7 +24,7 @@ export class UploadFileService {
 
   constructor() { }
 
-  async uploadFile(dto: CreateUploadFileDto, files: UploadFileFields) {
+  async uploadFile(dto: CreateUploadFileDto, files: UploadFileFields, userId: number) {
     try {
       const getPath = (fileArray?: Express.Multer.File[]) => {
         const filename = fileArray?.[0]?.filename;
@@ -36,12 +36,14 @@ export class UploadFileService {
         return filename ? `/uploads/${filename}` : '';
       };
 
-      const { idUser, ...restDto } = dto;
+      // Generate no_daftar automatically
+      const no_daftar = `SPMB-${Math.floor(100000 + Math.random() * 900000)}`; // e.g. SPMB-123456
 
       return await this.prisma.berkas.create({
         data: {
-          ...restDto,
-          idUser: Number(idUser),
+          ...dto,
+          idUser: userId,
+          no_daftar: no_daftar,
           surat_keterangan_lulus: getRequiredPath(files.surat_keterangan_lulus),
           raport: getRequiredPath(files.raport),
           ktp_ayah: getPath(files.ktp_ayah),
@@ -57,7 +59,7 @@ export class UploadFileService {
         },
       });
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 }
