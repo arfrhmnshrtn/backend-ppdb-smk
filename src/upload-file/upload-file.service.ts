@@ -1,4 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUploadFileDto } from './dto/create-upload-file.dto';
 import { UpdateUploadFileDto } from './dto/update-upload-file.dto';
 import { PrismaService } from '../lib/prisma.service.js';
@@ -22,10 +28,25 @@ export type UploadFileFields = {
 export class UploadFileService {
   private readonly prisma = PrismaService;
 
-  constructor() { }
+  constructor() {}
 
-  async uploadFile(dto: CreateUploadFileDto, files: UploadFileFields, userId: number) {
+  async uploadFile(
+    dto: CreateUploadFileDto,
+    files: UploadFileFields,
+    userId: number,
+  ) {
     try {
+      // cek apakah user sudah pernah mengupload berkas sebelumnya
+      const existingBerkas = await this.prisma.berkas.findFirst({
+        where: { idUser: userId },
+      });
+
+      if (existingBerkas) {
+        throw new BadRequestException(
+          'User sudah pernah mengupload berkas sebelumnya',
+        );
+      }
+
       const getPath = (fileArray?: Express.Multer.File[]) => {
         const filename = fileArray?.[0]?.filename;
         return filename ? `/uploads/${filename}` : null;
@@ -39,7 +60,7 @@ export class UploadFileService {
       // Generate no_daftar automatically
       const no_daftar = `SPMB-${Math.floor(100000 + Math.random() * 900000)}`; // e.g. SPMB-123456
 
-      return await this.prisma.berkas.create({
+      await this.prisma.berkas.create({
         data: {
           ...dto,
           idUser: userId,
@@ -58,8 +79,25 @@ export class UploadFileService {
           sk_pramuka: getPath(files.sk_pramuka),
         },
       });
+      return {
+        status: true,
+        message: 'Berkas berhasil diupload',
+        metadata: {
+          statusCode: HttpStatus.CREATED,
+        },
+      };
     } catch (error) {
-      throw error;
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+      }
+
+      throw new InternalServerErrorException(
+        'Terjadi kesalahan saat upload berkas',
+      );
     }
   }
 }
