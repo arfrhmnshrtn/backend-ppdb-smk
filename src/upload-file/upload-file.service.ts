@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { CreateUploadFileDto } from './dto/create-upload-file.dto';
 import { UpdateUploadFileDto } from './dto/update-upload-file.dto';
@@ -172,6 +173,41 @@ export class UploadFileService {
 
       throw new InternalServerErrorException(
         'Terjadi kesalahan saat update berkas',
+      );
+    }
+  }
+
+  // findallBerkas
+  async findAllBerkas(userId: number){
+    try {
+      // CEK APAKAH ROLE ADMIN
+      const admin = await this.prisma.user.findFirst({
+        where: { id: userId, role: "ADMIN" },
+      });
+      if(!admin){
+        throw new ForbiddenException(
+          'Anda tidak memiliki akses untuk melihat berkas. Fitur ini khusus ADMIN.',
+        );
+      }
+      const berkas = await this.prisma.berkas.findMany();
+      return {
+        status: true,
+        message: 'Berkas berhasil ditemukan',
+        metadata: {
+          statusCode: HttpStatus.OK,
+          length: berkas.length,
+        },
+        data: berkas,
+      };
+    }catch(error){
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
+      if(error instanceof Error){
+        console.error('Error message:', error.message);
+      }
+      throw new InternalServerErrorException(
+        'Terjadi kesalahan saat findall berkas',
       );
     }
   }

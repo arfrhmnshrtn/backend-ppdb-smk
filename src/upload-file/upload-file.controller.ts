@@ -26,11 +26,11 @@ if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath);
 }
 
-@Controller('upload-file')
+@Controller('berkas')
 export class UploadFileController {
   constructor(private readonly uploadFileService: UploadFileService) {}
 
-  @Post()
+  @Post("/upload")
   @UseGuards(AuthGuard)
   @UseInterceptors(
     CleanUploadedFilesInterceptor,
@@ -174,5 +174,13 @@ export class UploadFileController {
   ) {
     const userId = req.user?.sub;
     return this.uploadFileService.updateFile(dto, files, userId);
+  }
+
+  // lihat semua berkas
+  @Get("/all-berkas")
+  @UseGuards(AuthGuard)
+  findAllBerkas(@Req() req: any) {
+    const userId = req.user?.sub;
+    return this.uploadFileService.findAllBerkas(userId);
   }
 }
