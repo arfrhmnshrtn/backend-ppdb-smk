@@ -47,18 +47,20 @@ export class UploadFileService {
         );
       }
 
+      // Generate no_daftar secara lebih aman menggunakan crypto
+      const crypto = require('crypto');
+      const randomNum = crypto.randomInt(100000, 999999);
+      const no_daftar = `SPMB-${randomNum}`;
+
       const getPath = (fileArray?: Express.Multer.File[]) => {
         const filename = fileArray?.[0]?.filename;
-        return filename ? `/uploads/${filename}` : null;
+        return filename ? `/uploads/${userId}/${filename}` : null;
       };
 
       const getRequiredPath = (fileArray?: Express.Multer.File[]) => {
         const filename = fileArray?.[0]?.filename;
-        return filename ? `/uploads/${filename}` : '';
+        return filename ? `/uploads/${userId}/${filename}` : '';
       };
-
-      // Generate no_daftar automatically
-      const no_daftar = `SPMB-${Math.floor(100000 + Math.random() * 900000)}`; // e.g. SPMB-123456
 
       await this.prisma.berkas.create({
         data: {
@@ -97,6 +99,79 @@ export class UploadFileService {
 
       throw new InternalServerErrorException(
         'Terjadi kesalahan saat upload berkas',
+      );
+    }
+  }
+
+  // update file 
+  async updateFile(
+    dto: UpdateUploadFileDto,
+    files: UploadFileFields,
+    userId: number,
+  ) {
+    try {
+      const existingBerkas = await this.prisma.berkas.findFirst({
+        where: { idUser: userId },
+      });
+
+      if (!existingBerkas) {
+        throw new NotFoundException('Berkas tidak ditemukan');
+      }
+
+      // Validasi: hanya bisa update jika statusnya REVISI
+      if (existingBerkas.status_berkas !== 'REVISI') {
+        throw new BadRequestException(
+          'Berkas tidak bisa diupdate. Hanya berkas dengan status REVISI yang dapat diubah.',
+        );
+      }
+
+      // Gunakan 'undefined' jika tidak ada file baru, agar Prisma tidak menimpa data lama dengan null/kosong
+      const getPathForUpdate = (fileArray?: Express.Multer.File[]) => {
+        const filename = fileArray?.[0]?.filename;
+        return filename ? `/uploads/${userId}/${filename}` : undefined;
+      };
+
+      await this.prisma.berkas.update({
+        where: { id: existingBerkas.id }, // Harus menggunakan 'id' karena 'idUser' belum ditandai @unique di Prisma
+        data: {
+          ...dto,
+          surat_keterangan_lulus: getPathForUpdate(files.surat_keterangan_lulus),
+          raport: getPathForUpdate(files.raport),
+          ktp_ayah: getPathForUpdate(files.ktp_ayah),
+          ktp_ibu: getPathForUpdate(files.ktp_ibu),
+          kartu_keluarga: getPathForUpdate(files.kartu_keluarga),
+          akta_kelahiran: getPathForUpdate(files.akta_kelahiran),
+          pas_foto: getPathForUpdate(files.pas_foto),
+          sptjm: getPathForUpdate(files.sptjm),
+          kip: getPathForUpdate(files.kip),
+          paiagam: getPathForUpdate(files.paiagam),
+          sk_osis: getPathForUpdate(files.sk_osis),
+          sk_pramuka: getPathForUpdate(files.sk_pramuka),
+          status_berkas: 'PENDING', // Set status kembali ke PENDING untuk direview ulang admin
+        },
+      });
+
+      return {
+        status: true,
+        message: 'Berkas berhasil diupdate',
+        metadata: {
+          statusCode: HttpStatus.OK,
+        },
+      };
+    } catch (error) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+      }
+
+      throw new InternalServerErrorException(
+        'Terjadi kesalahan saat update berkas',
       );
     }
   }

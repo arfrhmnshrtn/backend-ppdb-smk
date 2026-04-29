@@ -61,11 +61,22 @@ export class UploadFileController {
             cb(null, folderPath);
           },
           filename: (req, file, cb) => {
+            const crypto = require('crypto');
             const fileExt = file.originalname.split('.').pop();
-            const uniqueName = Date.now() + '-' + file.fieldname + '.' + fileExt;
+            const uniqueName = crypto.randomUUID() + '.' + fileExt;
             cb(null, uniqueName);
           },
         }),
+        limits: {
+          fileSize: 5 * 1024 * 1024, // 5MB limit
+        },
+        fileFilter: (req, file, cb) => {
+          // Hanya izinkan PDF dan gambar (jpeg, png)
+          if (!file.originalname.match(/\.(pdf|jpg|jpeg|png)$/i)) {
+            return cb(new Error('Hanya file PDF dan gambar yang diizinkan!'), false);
+          }
+          cb(null, true);
+        },
       },
     ),
   )
@@ -90,5 +101,78 @@ export class UploadFileController {
   ) {
     const userId = req.user?.sub;
     return this.uploadFileService.uploadFile(dto, files, userId);
+  }
+
+  @Patch("/edit")
+  @UseGuards(AuthGuard)
+  @UseInterceptors(
+    CleanUploadedFilesInterceptor,
+    FileFieldsInterceptor(
+      [
+        { name: 'surat_keterangan_lulus', maxCount: 1 },
+        { name: 'raport', maxCount: 1 },
+        { name: 'ktp_ayah', maxCount: 1 },
+        { name: 'ktp_ibu', maxCount: 1 },
+        { name: 'kartu_keluarga', maxCount: 1 },
+        { name: 'akta_kelahiran', maxCount: 1 },
+        { name: 'pas_foto', maxCount: 1 },
+        { name: 'sptjm', maxCount: 1 },
+        { name: 'kip', maxCount: 1 },
+        { name: 'paiagam', maxCount: 1 },
+        { name: 'sk_osis', maxCount: 1 },
+        { name: 'sk_pramuka', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: (req: any, file, cb) => {
+            // buat folder lagi sesuai id user (dari JWT payload)
+            const userId = req.user?.sub;
+            const folderPath = `${uploadPath}/${userId}`;
+            if (!fs.existsSync(folderPath)) {
+              fs.mkdirSync(folderPath);
+            }
+            cb(null, folderPath);
+          },
+          filename: (req, file, cb) => {
+            const crypto = require('crypto');
+            const fileExt = file.originalname.split('.').pop();
+            const uniqueName = crypto.randomUUID() + '.' + fileExt;
+            cb(null, uniqueName);
+          },
+        }),
+        limits: {
+          fileSize: 5 * 1024 * 1024, // 5MB limit
+        },
+        fileFilter: (req, file, cb) => {
+          // Hanya izinkan PDF dan gambar (jpeg, png)
+          if (!file.originalname.match(/\.(pdf|jpg|jpeg|png)$/i)) {
+            return cb(new Error('Hanya file PDF dan gambar yang diizinkan!'), false);
+          }
+          cb(null, true);
+        },
+      },
+    ),
+  )
+  updateFile(
+    @Req() req: any,
+    @Body() dto: UpdateUploadFileDto,
+    @UploadedFiles()
+    files: {
+      surat_keterangan_lulus?: Express.Multer.File[];
+      raport?: Express.Multer.File[];
+      ktp_ayah?: Express.Multer.File[];
+      ktp_ibu?: Express.Multer.File[];
+      kartu_keluarga?: Express.Multer.File[];
+      akta_kelahiran?: Express.Multer.File[];
+      pas_foto?: Express.Multer.File[];
+      sptjm?: Express.Multer.File[];
+      kip?: Express.Multer.File[];
+      paiagam?: Express.Multer.File[];
+      sk_osis?: Express.Multer.File[];
+      sk_pramuka?: Express.Multer.File[];
+    },
+  ) {
+    const userId = req.user?.sub;
+    return this.uploadFileService.updateFile(dto, files, userId);
   }
 }
