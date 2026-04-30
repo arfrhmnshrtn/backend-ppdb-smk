@@ -30,7 +30,7 @@ if (!fs.existsSync(uploadPath)) {
 export class UploadFileController {
   constructor(private readonly uploadFileService: UploadFileService) {}
 
-  @Post("/upload")
+  @Post('/upload')
   @UseGuards(AuthGuard)
   @UseInterceptors(
     CleanUploadedFilesInterceptor,
@@ -73,7 +73,10 @@ export class UploadFileController {
         fileFilter: (req, file, cb) => {
           // Hanya izinkan PDF dan gambar (jpeg, png)
           if (!file.originalname.match(/\.(pdf|jpg|jpeg|png)$/i)) {
-            return cb(new Error('Hanya file PDF dan gambar yang diizinkan!'), false);
+            return cb(
+              new Error('Hanya file PDF dan gambar yang diizinkan!'),
+              false,
+            );
           }
           cb(null, true);
         },
@@ -103,7 +106,7 @@ export class UploadFileController {
     return this.uploadFileService.uploadFile(dto, files, userId);
   }
 
-  @Patch("/edit")
+  @Patch('/edit')
   @UseGuards(AuthGuard)
   @UseInterceptors(
     CleanUploadedFilesInterceptor,
@@ -146,7 +149,10 @@ export class UploadFileController {
         fileFilter: (req, file, cb) => {
           // Hanya izinkan PDF dan gambar (jpeg, png)
           if (!file.originalname.match(/\.(pdf|jpg|jpeg|png)$/i)) {
-            return cb(new Error('Hanya file PDF dan gambar yang diizinkan!'), false);
+            return cb(
+              new Error('Hanya file PDF dan gambar yang diizinkan!'),
+              false,
+            );
           }
           cb(null, true);
         },
@@ -177,7 +183,7 @@ export class UploadFileController {
   }
 
   // lihat semua berkas
-  @Get("/all-berkas")
+  @Get('/all-berkas')
   @UseGuards(AuthGuard)
   findAllBerkas(@Req() req: any) {
     const userId = req.user?.sub;
