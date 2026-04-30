@@ -20,8 +20,9 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
 
-  berkas Berkas[]
+  students students[]
 
+  // berkas Berkas[]
 }
 
 enum Role {
@@ -29,33 +30,71 @@ enum Role {
   ADMIN
 }
 
-model Berkas {
-  id        Int      @id @default(autoincrement())
-  no_daftar String
-  nama      String
-  no_hp     String
-  nisn      String
-  asal_sekolah String
-  alamat    String
-  jurusan   Jurusan
-  surat_keterangan_lulus String
-  raport String
-  ktp_ayah String?
-  ktp_ibu String?
-  kartu_keluarga String
-  akta_kelahiran String
-  pas_foto String
-  sptjm String
-  kip String?
-  paiagam String?
-  sk_osis String?
-  sk_pramuka String?
-  status_berkas StatusBerkas @default(PENDING)
-  // idUser User @relation(fields: [idUser], references: [id])
-  user User @relation(fields: [idUser], references: [id])
-  idUser Int
-  createdAt DateTime @default(now())
+// model Berkas {
+//   id        Int      @id @default(autoincrement())
+//   no_daftar String
+//   nama      String
+//   no_hp     String
+//   nisn      String
+//   asal_sekolah String
+//   alamat    String
+//   jurusan   Jurusan
+//   surat_keterangan_lulus String
+//   raport String
+//   ktp_ayah String?
+//   ktp_ibu String?
+//   kartu_keluarga String
+//   akta_kelahiran String
+//   pas_foto String
+//   sptjm String
+//   kip String?
+//   paiagam String?
+//   sk_osis String?
+//   sk_pramuka String?
+//   status_berkas StatusBerkas @default(PENDING)
+//   user User @relation(fields: [idUser], references: [id])
+//   idUser Int
+//   createdAt DateTime @default(now())
+// }
+
+// enum Jurusan {
+//   TKJ
+//   TKR
+//   ATP
+//   AK
+//   DKV
+// }
+
+// enum StatusBerkas {
+//   PENDING
+//   APPROVED
+//   REVISI
+//   REJECTED
+// }
+
+model students {
+  id            Int          @id @default(autoincrement())
+  id_user       Int          @unique
+  no_daftar     String
+  nama          String
+  no_hp         String
+  nisn          String
+  asal_sekolah  String
+  alamat        String
+  jurusan       Jurusan
+  // status_berkas StatusBerkas @default(PENDING)
+  created_at    DateTime     @default(now())
+
+  user      User        @relation(fields: [id_user], references: [id])
+  documents documents[]
 }
+
+// enum StatusBerkas {
+//   PENDING
+//   APPROVED
+//   REVISI
+//   REJECTED
+// }
 
 enum Jurusan {
   TKJ
@@ -65,10 +104,30 @@ enum Jurusan {
   DKV
 }
 
-enum StatusBerkas {
+model document_types {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  documents documents[]
+}
+
+model documents {
+  id               String         @id @default(cuid())
+  id_student       Int
+  id_document_type Int
+  file_path        String
+  status           StatusDocument @default(PENDING)
+  keterangan       String?
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  student       students       @relation(fields: [id_student], references: [id], onDelete: Cascade)
+  document_type document_types @relation(fields: [id_document_type], references: [id], onDelete: Cascade)
+}
+
+enum StatusDocument {
   PENDING
   APPROVED
   REVISI
   REJECTED
 }
-

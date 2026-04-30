@@ -31,57 +31,97 @@ export class UploadFileService {
 
   constructor() {}
 
+  private async processDocument(
+    studentId: number,
+    userId: number,
+    documentName: string,
+    fileArray?: Express.Multer.File[],
+    existingDocument?: any,
+  ) {
+    if (!fileArray || fileArray.length === 0) return;
+
+    const filename = fileArray[0].filename;
+    const filePath = `/uploads/${userId}/${filename}`;
+
+    // Pastikan document_type ada
+    const docType = await this.prisma.document_types.upsert({
+      where: { name: documentName },
+      update: {},
+      create: { name: documentName },
+    });
+
+    if (existingDocument) {
+      await this.prisma.documents.update({
+        where: { id: existingDocument.id },
+        data: {
+          file_path: filePath,
+          status: 'PENDING', // Kembali ke PENDING setelah direvisi
+        },
+      });
+    } else {
+      await this.prisma.documents.create({
+        data: {
+          id_student: studentId,
+          id_document_type: docType.id,
+          file_path: filePath,
+          status: 'PENDING',
+        },
+      });
+    }
+  }
+
   async uploadFile(
     dto: CreateUploadFileDto,
     files: UploadFileFields,
     userId: number,
   ) {
     try {
-      // cek apakah user sudah pernah mengupload berkas sebelumnya
-      const existingBerkas = await this.prisma.berkas.findFirst({
-        where: { idUser: userId },
+      const existingStudent = await this.prisma.students.findFirst({
+        where: { id_user: userId },
       });
 
-      if (existingBerkas) {
+      if (existingStudent) {
         throw new BadRequestException(
-          'User sudah pernah mengupload berkas sebelumnya',
+          'User sudah pernah mengisi data pendaftaran',
         );
       }
 
-      // Generate no_daftar secara lebih aman menggunakan crypto
       const crypto = require('crypto');
       const randomNum = crypto.randomInt(100000, 999999);
       const no_daftar = `SPMB-${randomNum}`;
 
-      const getPath = (fileArray?: Express.Multer.File[]) => {
-        const filename = fileArray?.[0]?.filename;
-        return filename ? `/uploads/${userId}/${filename}` : null;
-      };
-
-      const getRequiredPath = (fileArray?: Express.Multer.File[]) => {
-        const filename = fileArray?.[0]?.filename;
-        return filename ? `/uploads/${userId}/${filename}` : '';
-      };
-
-      await this.prisma.berkas.create({
+      // 1. Simpan data student
+      const student = await this.prisma.students.create({
         data: {
-          ...dto,
-          idUser: userId,
+          id_user: userId,
           no_daftar: no_daftar,
-          surat_keterangan_lulus: getRequiredPath(files.surat_keterangan_lulus),
-          raport: getRequiredPath(files.raport),
-          ktp_ayah: getPath(files.ktp_ayah),
-          ktp_ibu: getPath(files.ktp_ibu),
-          kartu_keluarga: getRequiredPath(files.kartu_keluarga),
-          akta_kelahiran: getRequiredPath(files.akta_kelahiran),
-          pas_foto: getRequiredPath(files.pas_foto),
-          sptjm: getRequiredPath(files.sptjm),
-          kip: getPath(files.kip),
-          paiagam: getPath(files.paiagam),
-          sk_osis: getPath(files.sk_osis),
-          sk_pramuka: getPath(files.sk_pramuka),
+          nama: dto.nama,
+          no_hp: dto.no_hp,
+          nisn: dto.nisn,
+          asal_sekolah: dto.asal_sekolah,
+          alamat: dto.alamat,
+          jurusan: dto.jurusan,
         },
       });
+
+      // 2. Simpan semua file sebagai documents
+      const documentFields = [
+        'surat_keterangan_lulus', 'raport', 'ktp_ayah', 'ktp_ibu',
+        'kartu_keluarga', 'akta_kelahiran', 'pas_foto', 'sptjm',
+        'kip', 'paiagam', 'sk_osis', 'sk_pramuka'
+      ];
+
+      for (const field of documentFields) {
+        if (files[field as keyof UploadFileFields]) {
+          await this.processDocument(
+            student.id,
+            userId,
+            field,
+            files[field as keyof UploadFileFields]
+          );
+        }
+      }
+
       return {
         status: true,
         message: 'Berkas berhasil diupload',
@@ -93,64 +133,76 @@ export class UploadFileService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-
       if (error instanceof Error) {
         console.error('Error message:', error.message);
       }
-
       throw new InternalServerErrorException(
         'Terjadi kesalahan saat upload berkas',
       );
     }
   }
 
-  // update file 
   async updateFile(
     dto: UpdateUploadFileDto,
     files: UploadFileFields,
     userId: number,
   ) {
     try {
-      const existingBerkas = await this.prisma.berkas.findFirst({
-        where: { idUser: userId },
+      const student = await this.prisma.students.findFirst({
+        where: { id_user: userId },
+        include: {
+          documents: {
+            include: { document_type: true },
+          },
+        },
       });
 
-      if (!existingBerkas) {
-        throw new NotFoundException('Berkas tidak ditemukan');
+      if (!student) {
+        throw new NotFoundException('Data siswa tidak ditemukan');
       }
 
-      // Validasi: hanya bisa update jika statusnya REVISI
-      if (existingBerkas.status_berkas !== 'REVISI') {
+      // Validasi: Cek apakah ada dokumen yang berstatus REVISI
+      const hasRevisi = student.documents.some((doc) => doc.status === 'REVISI');
+      if (!hasRevisi && student.documents.length > 0) {
         throw new BadRequestException(
           'Berkas tidak bisa diupdate. Hanya berkas dengan status REVISI yang dapat diubah.',
         );
       }
 
-      // Gunakan 'undefined' jika tidak ada file baru, agar Prisma tidak menimpa data lama dengan null/kosong
-      const getPathForUpdate = (fileArray?: Express.Multer.File[]) => {
-        const filename = fileArray?.[0]?.filename;
-        return filename ? `/uploads/${userId}/${filename}` : undefined;
-      };
-
-      await this.prisma.berkas.update({
-        where: { id: existingBerkas.id }, // Harus menggunakan 'id' karena 'idUser' belum ditandai @unique di Prisma
+      // Update data student
+      await this.prisma.students.update({
+        where: { id: student.id },
         data: {
-          ...dto,
-          surat_keterangan_lulus: getPathForUpdate(files.surat_keterangan_lulus),
-          raport: getPathForUpdate(files.raport),
-          ktp_ayah: getPathForUpdate(files.ktp_ayah),
-          ktp_ibu: getPathForUpdate(files.ktp_ibu),
-          kartu_keluarga: getPathForUpdate(files.kartu_keluarga),
-          akta_kelahiran: getPathForUpdate(files.akta_kelahiran),
-          pas_foto: getPathForUpdate(files.pas_foto),
-          sptjm: getPathForUpdate(files.sptjm),
-          kip: getPathForUpdate(files.kip),
-          paiagam: getPathForUpdate(files.paiagam),
-          sk_osis: getPathForUpdate(files.sk_osis),
-          sk_pramuka: getPathForUpdate(files.sk_pramuka),
-          status_berkas: 'PENDING', // Set status kembali ke PENDING untuk direview ulang admin
+          nama: dto.nama,
+          no_hp: dto.no_hp,
+          nisn: dto.nisn,
+          asal_sekolah: dto.asal_sekolah,
+          alamat: dto.alamat,
+          jurusan: dto.jurusan,
         },
       });
+
+      // Update files
+      const documentFields = [
+        'surat_keterangan_lulus', 'raport', 'ktp_ayah', 'ktp_ibu',
+        'kartu_keluarga', 'akta_kelahiran', 'pas_foto', 'sptjm',
+        'kip', 'paiagam', 'sk_osis', 'sk_pramuka'
+      ];
+
+      for (const field of documentFields) {
+        if (files[field as keyof UploadFileFields]) {
+          const existingDoc = student.documents.find(
+            (d) => d.document_type.name === field
+          );
+          await this.processDocument(
+            student.id,
+            userId,
+            field,
+            files[field as keyof UploadFileFields],
+            existingDoc
+          );
+        }
+      }
 
       return {
         status: true,
@@ -166,44 +218,80 @@ export class UploadFileService {
       ) {
         throw error;
       }
-
       if (error instanceof Error) {
         console.error('Error message:', error.message);
       }
-
       throw new InternalServerErrorException(
         'Terjadi kesalahan saat update berkas',
       );
     }
   }
 
-  // findallBerkas
-  async findAllBerkas(userId: number){
+  async findAllBerkas(userId: number) {
     try {
-      // CEK APAKAH ROLE ADMIN
       const admin = await this.prisma.user.findFirst({
-        where: { id: userId, role: "ADMIN" },
+        where: { id: userId, role: 'ADMIN' },
       });
-      if(!admin){
+
+      if (!admin) {
         throw new ForbiddenException(
           'Anda tidak memiliki akses untuk melihat berkas. Fitur ini khusus ADMIN.',
         );
       }
-      const berkas = await this.prisma.berkas.findMany();
+
+      const studentsData = await this.prisma.students.findMany({
+        include: {
+          user: { select: { email: true } },
+          documents: {
+            include: {
+              document_type: true,
+            },
+          },
+        },
+      });
+
+      // Format response agar lebih mudah dibaca oleh frontend
+      const formattedData = studentsData.map((student) => {
+        const files: Record<string, any> = {};
+        student.documents.forEach((doc) => {
+          files[doc.document_type.name] = {
+            id: doc.id,
+            path: doc.file_path,
+            status: doc.status,
+            keterangan: doc.keterangan,
+            updated_at: doc.updated_at,
+          };
+        });
+
+        return {
+          id: student.id,
+          no_daftar: student.no_daftar,
+          nama: student.nama,
+          email: student.user.email,
+          no_hp: student.no_hp,
+          nisn: student.nisn,
+          asal_sekolah: student.asal_sekolah,
+          alamat: student.alamat,
+          jurusan: student.jurusan,
+          created_at: student.created_at,
+          berkas: files,
+        };
+      });
+
       return {
         status: true,
-        message: 'Berkas berhasil ditemukan',
+        message: 'Data berhasil ditemukan',
         metadata: {
           statusCode: HttpStatus.OK,
-          length: berkas.length,
+          length: formattedData.length,
         },
-        data: berkas,
+        data: formattedData,
       };
-    }catch(error){
+    } catch (error) {
       if (error instanceof ForbiddenException) {
         throw error;
       }
-      if(error instanceof Error){
+      if (error instanceof Error) {
         console.error('Error message:', error.message);
       }
       throw new InternalServerErrorException(
