@@ -22,6 +22,7 @@ model students {
   verification_status VerificationStatus @default(BELUM_SUBMIT)
   documents           documents[]
   user                user               @relation(fields: [id_user], references: [id])
+  raporScores         RaporScore[]
 }
 
 model document_types {
@@ -82,4 +83,28 @@ enum StatusDocument {
 enum user_role {
   USER
   ADMIN
+}
+
+model RaporScore {
+  id         Int @id @default(autoincrement())
+  id_student Int
+
+  semester_1 Float
+  semester_2 Float
+  semester_3 Float
+  semester_4 Float
+  semester_5 Float
+
+  prestasi Int @default(0)
+
+  rata_rata Float @default(0)
+  nilai_akhir Float @default(0)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  student students @relation(fields: [id_student], references: [id], onDelete: Cascade)
+
+  @@unique([id_student], map: "rapor_scores_id_student_unique")
+  @@index([id_student], map: "rapor_scores_id_student_fkey")
 }

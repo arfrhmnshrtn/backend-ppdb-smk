@@ -5,9 +5,10 @@ import { AuthModule } from './auth/auth.module.js';
 import { UploadFileModule } from './upload-file/upload-file.module';
 import { UsersModule } from './users/users.module';
 import { ValidationsModule } from './validations/validations.module';
+import { RaporScoresModule } from './rapor-scores/rapor-scores.module';
 
 @Module({
-  imports: [AuthModule, UploadFileModule, UsersModule, ValidationsModule],
+  imports: [AuthModule, UploadFileModule, UsersModule, ValidationsModule, RaporScoresModule],
   controllers: [AppController],
   providers: [AppService],
 })
