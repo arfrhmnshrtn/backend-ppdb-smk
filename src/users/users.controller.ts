@@ -4,7 +4,7 @@ import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../../generated/prisma/client';
+import { user_role } from '../../generated/prisma/client';
 
 @Controller('users')
 export class UsersController {
@@ -17,7 +17,7 @@ export class UsersController {
 
   @Get('registration-status')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.USER)
+  @Roles(user_role.USER)
   getRegistrationStatus(@Req() req: Request & { user: { sub: number; role: string } }) {
     const userId = req.user.sub;
     return this.usersService.getRegistrationStatus(userId);

@@ -13,7 +13,7 @@ import { BulkValidateDocumentsDto } from './dto/bulk-validate-documents.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../../generated/prisma/client';
+import { user_role } from '../../generated/prisma/client';
 
 
 @Controller('validations')
@@ -29,7 +29,7 @@ export class ValidationsController {
    * - Dto validation class-validator
    */
   @Patch('documents/:id')
-  @Roles(Role.ADMIN)
+  @Roles(user_role.ADMIN)
   async validateDocument(
     @Param('id') id: string,
     @Body() validateDocumentDto: ValidateDocumentDto,
@@ -44,7 +44,7 @@ export class ValidationsController {
    * - Validasi studentId dan IDOR di service
    */
   @Patch('students/:studentId/documents')
-  @Roles(Role.ADMIN)
+  @Roles(user_role.ADMIN)
   async bulkValidateDocuments(
     @Param('studentId', ParseIntPipe) studentId: number,
     @Body() bulkValidateDto: BulkValidateDocumentsDto,

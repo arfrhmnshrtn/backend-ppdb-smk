@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -12,112 +7,26 @@ datasource db {
   provider = "mysql"
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String?
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-
-  students students[]
-
-  // berkas Berkas[]
-}
-
-enum Role {
-  USER
-  ADMIN
-}
-
-// model Berkas {
-//   id        Int      @id @default(autoincrement())
-//   no_daftar String
-//   nama      String
-//   no_hp     String
-//   nisn      String
-//   asal_sekolah String
-//   alamat    String
-//   jurusan   Jurusan
-//   surat_keterangan_lulus String
-//   raport String
-//   ktp_ayah String?
-//   ktp_ibu String?
-//   kartu_keluarga String
-//   akta_kelahiran String
-//   pas_foto String
-//   sptjm String
-//   kip String?
-//   paiagam String?
-//   sk_osis String?
-//   sk_pramuka String?
-//   status_berkas StatusBerkas @default(PENDING)
-//   user User @relation(fields: [idUser], references: [id])
-//   idUser Int
-//   createdAt DateTime @default(now())
-// }
-
-// enum Jurusan {
-//   TKJ
-//   TKR
-//   ATP
-//   AK
-//   DKV
-// }
-
-// enum StatusBerkas {
-//   PENDING
-//   APPROVED
-//   REVISI
-//   REJECTED
-// }
-
 model students {
-  id           Int      @id @default(autoincrement())
-  id_user      Int      @unique
-  no_daftar    String
-  nama         String
-  no_hp        String
-  nisn         String
-  asal_sekolah String
-  alamat       String
-  jurusan      Jurusan
-  // status_berkas StatusBerkas @default(PENDING)
-  created_at   DateTime @default(now())
-
+  id                  Int                @id @default(autoincrement())
+  id_user             Int                @unique
+  no_daftar           String
+  nama                String
+  no_hp               String
+  nisn                String
+  asal_sekolah        String
+  akreditasi_sekolah  String
+  alamat              String
+  jurusan             Jurusan
+  created_at          DateTime           @default(now())
   verification_status VerificationStatus @default(BELUM_SUBMIT)
-
-  user      User        @relation(fields: [id_user], references: [id])
-  documents documents[]
-}
-
-enum VerificationStatus {
-  BELUM_SUBMIT
-  MENUNGGU_VALIDASI
-  REVISI
-  TERVERIFIKASI
-  DITOLAK
-}
-
-// enum StatusBerkas {
-//   PENDING
-//   APPROVED
-//   REVISI
-//   REJECTED
-// }
-
-enum Jurusan {
-  TKJ
-  TKR
-  ATP
-  AK
-  DKV
+  documents           documents[]
+  user                user               @relation(fields: [id_user], references: [id])
 }
 
 model document_types {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
   documents documents[]
 }
 
@@ -130,9 +39,37 @@ model documents {
   keterangan       String?
   created_at       DateTime       @default(now())
   updated_at       DateTime       @updatedAt
+  document_type    document_types @relation(fields: [id_document_type], references: [id], onDelete: Cascade)
+  student          students       @relation(fields: [id_student], references: [id], onDelete: Cascade)
 
-  student       students       @relation(fields: [id_student], references: [id], onDelete: Cascade)
-  document_type document_types @relation(fields: [id_document_type], references: [id], onDelete: Cascade)
+  @@index([id_document_type], map: "documents_id_document_type_fkey")
+  @@index([id_student], map: "documents_id_student_fkey")
+}
+
+model user {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique(map: "User_email_key")
+  name      String?
+  password  String
+  createdAt DateTime  @default(now())
+  role      user_role @default(USER)
+  students  students?
+}
+
+enum VerificationStatus {
+  BELUM_SUBMIT
+  MENUNGGU_VALIDASI
+  REVISI
+  TERVERIFIKASI
+  DITOLAK
+}
+
+enum Jurusan {
+  TKJ
+  TKR
+  ATP
+  AK
+  DKV
 }
 
 enum StatusDocument {
@@ -140,4 +77,9 @@ enum StatusDocument {
   APPROVED
   REVISI
   REJECTED
+}
+
+enum user_role {
+  USER
+  ADMIN
 }

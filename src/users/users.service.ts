@@ -12,9 +12,7 @@ export class UsersService {
       const whereCondition = jurusan
         ? {
             students: {
-              some: {
-                jurusan: jurusan.toUpperCase() as any,
-              },
+              jurusan: jurusan.toUpperCase() as any,
             },
           }
         : {}; // Jika tidak ada, kembalikan semua user
@@ -37,14 +35,15 @@ export class UsersService {
         },
         data: users.map((user) => ({
           idUser: user.id,
-          no_daftar: user.students[0]?.no_daftar || null,
+          no_daftar: user.students?.no_daftar || null,
           email: user.email,
-          nama: user.students[0]?.nama || null,
-          jurusan: user.students[0]?.jurusan || null,
-          no_hp: user.students[0]?.no_hp || null,
-          nisn: user.students[0]?.nisn || null,
-          asal_sekolah: user.students[0]?.asal_sekolah || null,
-          alamat: user.students[0]?.alamat || null,
+          nama: user.students?.nama || null,
+          jurusan: user.students?.jurusan || null,
+          no_hp: user.students?.no_hp || null,
+          nisn: user.students?.nisn || null,
+          asal_sekolah: user.students?.asal_sekolah || null,
+          akreditasi_sekolah: user.students?.akreditasi_sekolah || null,
+          alamat: user.students?.alamat || null,
         })),
       };
     } catch (error) {

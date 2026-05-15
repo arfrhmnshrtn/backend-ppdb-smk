@@ -16,6 +16,9 @@ export class CreateUploadFileDto {
   asal_sekolah!: string;
 
   @IsString()
+  akreditasi_sekolah!: string;
+
+  @IsString()
   alamat!: string;
 
   @IsEnum(Jurusan)
