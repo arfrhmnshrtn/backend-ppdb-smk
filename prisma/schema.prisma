@@ -73,20 +73,30 @@ enum Role {
 // }
 
 model students {
-  id            Int          @id @default(autoincrement())
-  id_user       Int          @unique
-  no_daftar     String
-  nama          String
-  no_hp         String
-  nisn          String
-  asal_sekolah  String
-  alamat        String
-  jurusan       Jurusan
+  id           Int      @id @default(autoincrement())
+  id_user      Int      @unique
+  no_daftar    String
+  nama         String
+  no_hp        String
+  nisn         String
+  asal_sekolah String
+  alamat       String
+  jurusan      Jurusan
   // status_berkas StatusBerkas @default(PENDING)
-  created_at    DateTime     @default(now())
+  created_at   DateTime @default(now())
+
+  verification_status VerificationStatus @default(BELUM_SUBMIT)
 
   user      User        @relation(fields: [id_user], references: [id])
   documents documents[]
+}
+
+enum VerificationStatus {
+  BELUM_SUBMIT
+  MENUNGGU_VALIDASI
+  REVISI
+  TERVERIFIKASI
+  DITOLAK
 }
 
 // enum StatusBerkas {
