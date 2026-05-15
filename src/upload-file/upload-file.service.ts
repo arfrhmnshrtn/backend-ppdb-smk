@@ -9,6 +9,8 @@ import {
 import { CreateUploadFileDto } from './dto/create-upload-file.dto';
 import { UpdateUploadFileDto } from './dto/update-upload-file.dto';
 import { PrismaService } from '../lib/prisma.service.js';
+import { ValidationsService } from '../validations/validations.service';
+import * as fs from 'fs/promises';
 
 export type UploadFileFields = {
   surat_keterangan_lulus?: Express.Multer.File[];
@@ -29,7 +31,7 @@ export type UploadFileFields = {
 export class UploadFileService {
   private readonly prisma = PrismaService;
 
-  constructor() {}
+  constructor(private validationsService: ValidationsService) {}
 
   private async processDocument(
     studentId: number,
@@ -51,11 +53,17 @@ export class UploadFileService {
     });
 
     if (existingDocument) {
+      // Hapus file lama jika ada
+      if (existingDocument.file_path) {
+        await this.deleteFileSafely(existingDocument.file_path);
+      }
+
       await this.prisma.documents.update({
         where: { id: existingDocument.id },
         data: {
           file_path: filePath,
           status: 'PENDING', // Kembali ke PENDING setelah direvisi
+          keterangan: null,  // Hapus keterangan karena dokumen sudah direvisi
         },
       });
     } else {
@@ -67,6 +75,19 @@ export class UploadFileService {
           status: 'PENDING',
         },
       });
+    }
+  }
+
+  private async deleteFileSafely(filePath: string) {
+    try {
+      const fullPath = filePath.startsWith('/') ? `.${filePath}` : filePath;
+      await fs.access(fullPath);
+      await fs.unlink(fullPath);
+    } catch (error) {
+      const err = error as NodeJS.ErrnoException;
+      if (err.code !== 'ENOENT') {
+        console.error(`Gagal menghapus file lama di ${filePath}:`, error);
+      }
     }
   }
 
@@ -121,6 +142,9 @@ export class UploadFileService {
           );
         }
       }
+
+      // 3. Update status verifikasi otomatis setelah submit berkas awal
+      await this.validationsService.updateStudentVerificationStatus(student.id);
 
       return {
         status: true,
@@ -203,6 +227,9 @@ export class UploadFileService {
           );
         }
       }
+
+      // Update status verifikasi otomatis setelah revisi via modul berkas
+      await this.validationsService.updateStudentVerificationStatus(student.id);
 
       return {
         status: true,

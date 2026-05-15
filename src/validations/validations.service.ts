@@ -8,9 +8,7 @@ import {
 import { ValidateDocumentDto } from './dto/validate-document.dto';
 import { BulkValidateDocumentsDto } from './dto/bulk-validate-documents.dto';
 import { PrismaService } from '../lib/prisma.service';
-import { StatusDocument } from '../../generated/prisma/client';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import { StatusDocument, VerificationStatus } from '../../generated/prisma/client';
 
 @Injectable()
 export class ValidationsService {
@@ -48,6 +46,7 @@ export class ValidationsService {
         },
         select: {
           id: true,
+          id_student: true, // Diperlukan untuk validasi siswa
           status: true,
           keterangan: true,
           updated_at: true,
@@ -55,11 +54,17 @@ export class ValidationsService {
         },
       });
 
-      // 4. Return format konsisten
+      // 4. Update status verifikasi siswa secara otomatis
+      await this.updateStudentVerificationStatus(updatedDocument.id_student);
+
+      // Pisahkan id_student agar tidak ter-expose di response
+      const { id_student, ...responseData } = updatedDocument;
+
+      // 5. Return format konsisten
       return {
         success: true,
         message: 'Validasi dokumen berhasil diperbarui',
-        data: updatedDocument,
+        data: responseData,
       };
     } catch (error) {
       this.handleException(error, 'Gagal memvalidasi dokumen');
@@ -114,6 +119,9 @@ export class ValidationsService {
       // 4. Eksekusi transaction, semua akan commit bersamaan atau rollback jika salah satu gagal
       await this.prisma.$transaction(transactionOperations);
 
+      // 5. Update status verifikasi siswa secara otomatis berdasarkan hasil bulk validation
+      await this.updateStudentVerificationStatus(studentId);
+
       return {
         success: true,
         message: 'Validasi dokumen berhasil',
@@ -127,89 +135,50 @@ export class ValidationsService {
     }
   }
 
-  /**
-   * Method untuk siswa upload ulang dokumen yang direvisi
-   */
-  async reuploadDocument(id: string, file: Express.Multer.File, userId: number) {
-    try {
-      // 1. Cari dokumen beserta data student untuk verifikasi ownership
-      const existingDocument = await this.prisma.documents.findUnique({
-        where: { id },
-        include: {
-          student: true, // Relasi ke students
-        },
-      });
-
-      if (!existingDocument) {
-        // Hapus file yang baru saja terupload jika dokumen tidak valid
-        await this.deleteFileSafely(file.path);
-        throw new NotFoundException('Dokumen tidak ditemukan');
-      }
-
-      // 2. Validasi IDOR (Insecure Direct Object Reference)
-      // Pastikan dokumen ini milik user yang sedang login
-      if (existingDocument.student.id_user !== userId) {
-        await this.deleteFileSafely(file.path);
-        throw new ForbiddenException('Akses ditolak: Dokumen ini bukan milik Anda');
-      }
-
-      // 3. Validasi status dokumen
-      // Siswa HANYA boleh upload ulang jika statusnya REVISI
-      if (existingDocument.status !== StatusDocument.REVISI) {
-        await this.deleteFileSafely(file.path);
-        throw new BadRequestException('Dokumen hanya dapat diunggah ulang jika statusnya REVISI');
-      }
-
-      // 4. Hapus file lama dari local storage menggunakan fs.unlink
-      if (existingDocument.file_path) {
-        await this.deleteFileSafely(existingDocument.file_path);
-      }
-
-      // 5. Update database: update file_path, status kembali PENDING, keterangan null
-      const updatedDocument = await this.prisma.documents.update({
-        where: { id },
-        data: {
-          file_path: file.path.replace(/\\/g, '/'), // Standarisasi path
-          status: StatusDocument.PENDING,
-          keterangan: null,
-        },
-        select: {
-          id: true,
-          status: true,
-          updated_at: true,
-          // Sanitize response, jangan expose file_path penuh jika itu path absolut/sensitif
-        },
-      });
-
-      return {
-        success: true,
-        message: 'Dokumen revisi berhasil diunggah',
-        data: updatedDocument,
-      };
-    } catch (error) {
-      // Pastikan file baru dihapus jika terjadi error di tengah proses database
-      await this.deleteFileSafely(file.path);
-      this.handleException(error, 'Gagal mengunggah ulang dokumen revisi');
-    }
-  }
 
   /**
-   * Reusable helper untuk menghapus file dengan aman
+   * Helper method untuk update status verifikasi siswa secara otomatis.
+   * Backend adalah source of truth untuk field verification_status.
    */
-  private async deleteFileSafely(filePath: string) {
-    try {
-      // Cek apakah file ada
-      await fs.access(filePath);
-      // Hapus file
-      await fs.unlink(filePath);
-    } catch (error) {
-      // Ignore error jika file tidak ditemukan
-      const err = error as NodeJS.ErrnoException;
-      if (err.code !== 'ENOENT') {
-        console.error(`Gagal menghapus file lama di ${filePath}:`, error);
+  async updateStudentVerificationStatus(studentId: number) {
+    // 1. Ambil total jenis dokumen yang wajib disubmit
+    const totalDocumentTypes = await this.prisma.document_types.count();
+
+    // 2. Ambil semua dokumen yang di-submit oleh siswa ini
+    const studentDocuments = await this.prisma.documents.findMany({
+      where: { id_student: studentId },
+    });
+
+    let newStatus: VerificationStatus = VerificationStatus.BELUM_SUBMIT;
+
+    if (studentDocuments.length > 0 && studentDocuments.length >= totalDocumentTypes) {
+      // Siswa sudah submit semua dokumen (atau lebih), jalankan pengecekan prioritas status
+      const hasRejected = studentDocuments.some(doc => doc.status === StatusDocument.REJECTED);
+      const hasRevisi = studentDocuments.some(doc => doc.status === StatusDocument.REVISI);
+      const allApproved = studentDocuments.every(doc => doc.status === StatusDocument.APPROVED);
+
+      if (hasRejected) {
+        newStatus = VerificationStatus.DITOLAK;
+      } else if (hasRevisi) {
+        newStatus = VerificationStatus.REVISI;
+      } else if (allApproved) {
+        newStatus = VerificationStatus.TERVERIFIKASI;
+      } else {
+        newStatus = VerificationStatus.MENUNGGU_VALIDASI; // Masih ada yang PENDING
       }
+    } else if (studentDocuments.length > 0) {
+      // Siswa baru submit sebagian dokumen
+      newStatus = VerificationStatus.BELUM_SUBMIT;
     }
+
+    // 3. Update status siswa secara atomic
+    await this.prisma.students.update({
+      where: { id: studentId },
+      data: { verification_status: newStatus },
+    });
   }
+
+
 
   /**
    * Reusable helper untuk menangani exception agar pesan error lebih rapi

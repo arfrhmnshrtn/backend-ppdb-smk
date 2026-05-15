@@ -1,6 +1,6 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../lib/prisma.service.js';
-import { HttpStatus } from '@nestjs/common';
+import { StatusDocument } from '../../generated/prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -51,6 +51,55 @@ export class UsersService {
       console.error('Error findByJurusan:', error);
       throw new InternalServerErrorException(
         'Terjadi kesalahan saat mengambil data user',
+      );
+    }
+  }
+
+  async getRegistrationStatus(userId: number) {
+    try {
+      const student = await this.prisma.students.findUnique({
+        where: { id_user: userId },
+        include: {
+          documents: {
+            include: { document_type: true },
+          },
+        },
+      });
+
+      if (!student) {
+        throw new NotFoundException('Data pendaftaran tidak ditemukan. Siswa belum mensubmit berkas.');
+      }
+
+      // Filter dokumen yang berstatus REVISI atau REJECTED saja
+      const problemDocuments = student.documents
+        .filter(
+          (doc) =>
+            doc.status === StatusDocument.REVISI ||
+            doc.status === StatusDocument.REJECTED,
+        )
+        .map((doc) => ({
+          id: doc.id,
+          type: doc.document_type.name,
+          status: doc.status,
+          keterangan: doc.keterangan || 'Tidak ada keterangan',
+          updated_at: doc.updated_at,
+        }));
+
+      return {
+        success: true,
+        message: 'Berhasil mengambil status pendaftaran',
+        data: {
+          verification_status: student.verification_status,
+          documents_need_revision: problemDocuments,
+        },
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error; // Rethrow 404
+      }
+      console.error('Error getRegistrationStatus:', error);
+      throw new InternalServerErrorException(
+        'Terjadi kesalahan saat mengambil status pendaftaran',
       );
     }
   }
