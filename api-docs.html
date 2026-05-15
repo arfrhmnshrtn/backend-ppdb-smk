@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dokumentasi API - PPDB SMK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6', // Blue 500
+                        secondary: '#64748b', // Slate 500
+                        dark: '#0f172a', // Slate 900
+                        light: '#f8fafc', // Slate 50
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                        mono: ['Fira Code', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #0f172a;
+        }
+        pre {
+            font-family: 'Fira Code', monospace;
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        code {
+            font-family: 'Fira Code', monospace;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: 1em;
+        }
+        .method-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .method-get { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .method-post { background-color: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .method-patch { background-color: #fefce8; color: #ca8a04; border: 1px solid #fef08a; }
+        .method-delete { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        
+        .endpoint-card {
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease-in-out;
+            scroll-margin-top: 5rem;
+        }
+        .endpoint-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-color: #cbd5e1;
+        }
+        
+        .sidebar-link {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            transition: all 0.15s ease;
+            margin-bottom: 0.25rem;
+            text-decoration: none;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+        
+        .auth-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            color: #64748b;
+            gap: 0.25rem;
+        }
+        .auth-badge.required {
+            border-color: #fecaca;
+            background-color: #fef2f2;
+            color: #b91c1c;
+        }
+        .auth-badge.admin {
+            border-color: #e0e7ff;
+            background-color: #eef2ff;
+            color: #4338ca;
+        }
+        .auth-badge.public {
+            border-color: #dcfce3;
+            background-color: #f0fdf4;
+            color: #15803d;
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+        .table-custom th, .table-custom td {
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        .table-custom th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+        }
+        .table-custom tr:nth-child(even) {
+            background-color: #fcfcfd;
+        }
+        
+        /* Smooth scrollbar for sidebar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="antialiased flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-72 flex-shrink-0 bg-white border-r border-slate-200 h-full overflow-y-auto flex flex-col hidden lg:flex">
+        <div class="h-16 flex items-center px-6 border-b border-slate-200 sticky top-0 bg-white z-10">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm">
+                    API
+                </div>
+                <h1 class="text-lg font-bold text-dark tracking-tight">PPDB SMK Docs</h1>
+            </div>
+        </div>
+        <div class="p-4 flex-1">
+            <nav>
+                <div class="mb-8">
+                    <h2 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">General</h2>
+                    <a href="#getting-started" class="sidebar-link">Getting Started</a>
+                    <a href="#authentication-guide" class="sidebar-link">Authentication Guide</a>
+                </div>
+                
+                <div class="mb-8">
+                    <h2 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Auth Endpoints</h2>
+                    <a href="#auth-register" class="sidebar-link flex items-center justify-between"><span>Register</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
+                    <a href="#auth-login" class="sidebar-link flex items-center justify-between"><span>Login</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
+                    <a href="#auth-register-admin" class="sidebar-link flex items-center justify-between"><span>Register Admin</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
+                    <a href="#auth-login-admin" class="sidebar-link flex items-center justify-between"><span>Login Admin</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
+                </div>
+
+                <div class="mb-8">
+                    <h2 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Berkas Endpoints</h2>
+                    <a href="#berkas-upload" class="sidebar-link flex items-center justify-between"><span>Upload Berkas</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
+                    <a href="#berkas-edit" class="sidebar-link flex items-center justify-between"><span>Edit Berkas</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">PATCH</span></a>
+                    <a href="#berkas-all" class="sidebar-link flex items-center justify-between"><span>Semua Berkas</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">GET</span></a>
+                </div>
+
+                <div class="mb-8">
+                    <h2 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Users Endpoints</h2>
+                    <a href="#users-all" class="sidebar-link flex items-center justify-between"><span>Daftar Siswa</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">GET</span></a>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto bg-slate-50 relative scroll-smooth">
+        <!-- Header Mobile -->
+        <header class="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center px-4 sticky top-0 z-20">
+            <h1 class="text-lg font-bold text-dark">API PPDB SMK</h1>
+        </header>
+
+        <div class="max-w-4xl mx-auto px-6 py-12 lg:px-12">
+            
+            <!-- Section: Getting Started -->
+            <section id="getting-started" class="mb-16 scroll-mt-20">
+                <h1 class="text-4xl font-extrabold text-slate-900 mb-4">Dokumentasi API PPDB SMK</h1>
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                    Selamat datang di dokumentasi resmi API Pendaftaran Peserta Didik Baru (PPDB) SMK. API ini dibangun dengan framework <strong>NestJS</strong> dan dirancang sedemikian rupa agar mudah diintegrasikan dengan aplikasi Frontend Anda.
+                </p>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 flex gap-4 text-blue-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 text-blue-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <h4 class="font-semibold text-blue-900 mb-1">Base URL</h4>
+                        <p class="text-sm">Semua endpoint API pada dokumentasi ini merujuk secara relatif pada URL server utama Anda, contohnya: <code>http://localhost:3000</code>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Authentication Guide -->
+            <section id="authentication-guide" class="mb-16 scroll-mt-20">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4 border-b border-slate-200 pb-2">Panduan Autentikasi (Authorization)</h2>
+                <p class="text-slate-600 mb-4">
+                    Beberapa endpoint dalam API ini bersifat <em>protected</em> (dilindungi) dan memerlukan otentikasi menggunakan metode <strong>JWT (JSON Web Token)</strong>. 
+                </p>
+                
+                <h3 class="text-lg font-semibold mt-6 mb-2">Bagaimana cara kerjanya?</h3>
+                <ol class="list-decimal list-inside space-y-2 text-slate-600 mb-6 ml-2">
+                    <li>Kirim request login ke endpoint <code>/auth/login</code> (untuk siswa) atau <code>/auth/login-admin</code> (untuk admin).</li>
+                    <li>Jika berhasil, server akan mengembalikan data beserta properti <code>token</code>.</li>
+                    <li>Sematkan token tersebut pada <strong>HTTP Headers</strong> di setiap request yang membutuhkan otorisasi.</li>
+                </ol>
+
+                <div class="bg-white border border-slate-200 rounded-lg p-5 mb-4 shadow-sm">
+                    <h4 class="font-medium text-sm text-slate-500 uppercase tracking-wider mb-2">Format Header Request</h4>
+                    <pre class="m-0"><code>Authorization: Bearer &lt;token_anda_disini&gt;</code></pre>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-5 flex gap-4 text-amber-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 text-amber-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <h4 class="font-semibold text-amber-900 mb-1">Penting</h4>
+                        <p class="text-sm">Hak akses (Role) dibedakan menjadi <strong>USER</strong> (siswa) dan <strong>ADMIN</strong>. Beberapa endpoint tertentu seperti <code>/berkas/all-berkas</code> akan secara spesifik menolak request jika token yang digunakan bukan milik Admin (mengembalikan status 403 Forbidden).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================== -->
+            <!-- AUTH ENDPOINTS -->
+            <!-- ============================================== -->
+            <div class="flex items-center gap-4 mb-8 mt-12">
+                <h2 class="text-3xl font-bold text-slate-900">Authentication</h2>
+                <div class="h-px bg-slate-200 flex-1"></div>
+            </div>
+
+            <!-- Endpoint: Register -->
+            <article id="auth-register" class="endpoint-card">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="method-badge method-post">POST</span>
+                    <h3 class="text-xl font-bold font-mono text-slate-800">/auth/register</h3>
+                    <div class="ml-auto flex gap-2">
+                        <span class="auth-badge public">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
+                            Public
+                        </span>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 mb-6">Mendaftarkan akun baru untuk pendaftar/siswa.</p>
+
+                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Request Body <span class="text-slate-400 font-normal lowercase">(application/json)</span></h4>
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-slate-700">name</td>
+                            <td class="text-slate-500">String</td>
+                            <td>Nama lengkap pendaftar (wajib)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">email</td>
+                            <td class="text-slate-500">String</td>
+                            <td>Alamat email unik (wajib)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">password</td>
+                            <td class="text-slate-500">String</td>
+                            <td>Kata sandi akun (wajib)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
+                    <span>Response</span>
+                    <span class="text-green-600">201 Created</span>
+                </h4>
+<pre><code>{
+  "status": true,
+  "message": "Pendaftaran berhasil"
+}</code></pre>
+            </article>
+
+            <!-- Endpoint: Login -->
+            <article id="auth-login" class="endpoint-card">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="method-badge method-post">POST</span>
+                    <h3 class="text-xl font-bold font-mono text-slate-800">/auth/login</h3>
+                    <div class="ml-auto flex gap-2">
+                        <span class="auth-badge public">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
+                            Public
+                        </span>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 mb-6">Masuk ke akun siswa dan mendapatkan JWT Token.</p>
+
+                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Request Body <span class="text-slate-400 font-normal lowercase">(application/json)</span></h4>
+<pre><code>{
+  "email": "siswa@example.com",
+  "password": "password123"
+}</code></pre>
+
+                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
+                    <span>Response</span>
+                    <span class="text-blue-600">200 OK</span>
+                </h4>
+<pre><code>{
+  "status": true,
+  "message": "Login berhasil",
+  "data": {
+    "id": 1,
+    "name": "Nama Siswa",
+    "email": "siswa@example.com",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}</code></pre>
+            </article>
+
+            <!-- Endpoint: Register Admin -->
+            <article id="auth-register-admin" class="endpoint-card">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="method-badge method-post">POST</span>
+                    <h3 class="text-xl font-bold font-mono text-slate-800">/auth/register-admin</h3>
+                    <div class="ml-auto flex gap-2">
+                        <span class="auth-badge public">
+                            Public
+                        </span>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 mb-6">Mendaftarkan akun baru yang secara otomatis diberikan <em>role</em> <strong>ADMIN</strong>.</p>
+                <p class="text-sm text-slate-500 mb-4 bg-slate-50 p-3 rounded-md border border-slate-100">Request parameter dan format response identik dengan endpoint <code>/auth/register</code> biasa.</p>
+            </article>
+
+            <!-- Endpoint: Login Admin -->
+            <article id="auth-login-admin" class="endpoint-card">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="method-badge method-post">POST</span>
+                    <h3 class="text-xl font-bold font-mono text-slate-800">/auth/login-admin</h3>
+                    <div class="ml-auto flex gap-2">
+                        <span class="auth-badge public">
+                            Public
+                        </span>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 mb-6">Masuk ke sistem khusus untuk akun ber-role <strong>ADMIN</strong>. Akan mengembalikan Error 401 jika login menggunakan akun siswa.</p>
+                <p class="text-sm text-slate-500 mb-4 bg-slate-50 p-3 rounded-md border border-slate-100">Request parameter dan format response identik dengan endpoint <code>/auth/login</code> biasa.</p>
+            </article>
+
+            <!-- ============================================== -->
+            <!-- BERKAS ENDPOINTS -->
+            <!-- ============================================== -->
+            <div class="flex items-center gap-4 mb-8 mt-12">
+                <h2 class="text-3xl font-bold text-slate-900">Upload Berkas</h2>
+                <div class="h-px bg-slate-200 flex-1"></div>
+            </div>
+
+            <!-- Endpoint: Upload Berkas -->
+            <article id="berkas-upload" class="endpoint-card">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="method-badge method-post">POST</span>
+                    <h3 class="text-xl font-bold font-mono text-slate-800">/berkas/upload</h3>
+                    <div class="ml-auto flex gap-2">
+                        <span class="auth-badge required">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            Auth Required
+                        </span>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 mb-6">Menyimpan data pendaftaran siswa dan mengupload file dokumen pendukung secara bersamaan.</p>
+
+                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Request Form Data <span class="text-slate-400 font-normal lowercase">(multipart/form-data)</span></h4>
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Type</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-slate-700">nama</td>
+                            <td class="text-slate-500">Text</td>
+                            <td>Nama lengkap siswa</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">no_hp</td>
+                            <td class="text-slate-500">Text</td>
+                            <td>Nomor Handphone yang bisa dihubungi</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">nisn</td>
+                            <td class="text-slate-500">Text</td>
+                            <td>Nomor Induk Siswa Nasional</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">asal_sekolah</td>
+                            <td class="text-slate-500">Text</td>
+                            <td>Nama sekolah sebelumnya</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">alamat</td>
+                            <td class="text-slate-500">Text</td>
+                            <td>Alamat domisili lengkap</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">jurusan</td>
+                            <td class="text-slate-500">Text/Enum</td>
+                            <td>Jurusan yang dipilih (sesuai enum Prisma)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="bg-slate-50 font-semibold text-slate-700 text-center text-xs uppercase tracking-wider py-2">Attachment Files (Max 5MB per file, Format: PDF/JPG/PNG)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">surat_keterangan_lulus</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Scan Surat Keterangan Lulus (SKL)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">raport</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Scan Raport Sekolah</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">ktp_ayah</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Scan KTP Ayah</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">ktp_ibu</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Scan KTP Ibu</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">kartu_keluarga</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Scan Kartu Keluarga (KK)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">akta_kelahiran</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Scan Akta Kelahiran</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">pas_foto</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Pas Foto Formal</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">sptjm</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Surat Pernyataan Tanggung Jawab Mutlak</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">kip</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Kartu Indonesia Pintar (Opsional)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">paiagam</td>
+                            <td class="text-slate-500">File</td>
+                            <td>Piagam Penghargaan (Opsional)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">sk_osis</td>
+                            <td class="text-slate-500">File</td>
+                            <td>SK Pengurus OSIS (Opsional)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-slate-700">sk_pramuka</td>
+                            <td class="text-slate-500">File</td>
+                            <td>SK Pramuka (Opsional)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
+                    <span>Response</span>
+                    <span class="text-green-600">201 Created</span>
+                </h4>
+<pre><code>{
+  "status": true,
+  "message": "Berkas berhasil diupload",
+  "metadata": {
+    "statusCode": 201
+  }
+}</code></pre>
+            </article>
+
+            <!-- Endpoint: Edit Berkas -->
+            <article id="berkas-edit" class="endpoint-card">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="method-badge method-patch">PATCH</span>
+                    <h3 class="text-xl font-bold font-mono text-slate-800">/berkas/edit</h3>
+                    <div class="ml-auto flex gap-2">
+                        <span class="auth-badge required">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            Auth Required
+                        </span>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 mb-6">Memperbarui data diri siswa atau mengupload ulang berkas yang salah/ditolak oleh admin.</p>
+                
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r-md">
+                    <h4 class="text-amber-800 font-bold mb-1 text-sm">Persyaratan Khusus Endpoint Edit</h4>
+                    <p class="text-amber-700 text-sm">API akan menolak perubahan (Error 400 Bad Request) apabila <strong>TIDAK ADA SATU PUN</strong> dokumen milik siswa yang berstatus <code>REVISI</code>.</p>
+                </div>
+
+                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Request Form Data <span class="text-slate-400 font-normal lowercase">(multipart/form-data)</span></h4>
+                <p class="text-sm text-slate-500 mb-4">Parameter sama dengan endpoint <code>/berkas/upload</code>. Semua field bersifat <em>opsional</em> (partial update). Anda cukup mengirimkan data atau file yang ingin diubah saja.</p>
+
+                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
+                    <span>Response</span>
+                    <span class="text-blue-600">200 OK</span>
+                </h4>
+<pre><code>{
+  "status": true,
+  "message": "Berkas berhasil diupdate",
+  "metadata": {
+    "statusCode": 200
+  }
+}</code></pre>
+            </article>
+
+            <!-- Endpoint: All Berkas -->
+            <article id="berkas-all" class="endpoint-card">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="method-badge method-get">GET</span>
+                    <h3 class="text-xl font-bold font-mono text-slate-800">/berkas/all-berkas</h3>
+                    <div class="ml-auto flex gap-2">
+                        <span class="auth-badge admin">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                            Admin Only
+                        </span>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 mb-6">Mengambil rekap seluruh data siswa pendaftar beserta detail dan status masing-masing berkasnya.</p>
+
+                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
+                    <span>Response</span>
+                    <span class="text-blue-600">200 OK</span>
+                </h4>
+<pre><code>{
+  "status": true,
+  "message": "Data berhasil ditemukan",
+  "metadata": {
+    "statusCode": 200,
+    "length": 1
+  },
+  "data": [
+    {
+      "id": 1,
+      "no_daftar": "SPMB-123456",
+      "nama": "Nama Siswa",
+      "email": "siswa@example.com",
+      "no_hp": "08123456789",
+      "nisn": "1234567890",
+      "asal_sekolah": "SMP 1",
+      "alamat": "Jl. Mawar",
+      "jurusan": "RPL",
+      "created_at": "2026-05-03T10:00:00Z",
+      "berkas": {
+        "surat_keterangan_lulus": {
+          "id": 1,
+          "path": "/uploads/1/uuid-skls.pdf",
+          "status": "PENDING",
+          "keterangan": null,
+          "updated_at": "2026-05-03T10:00:00Z"
+        },
+        "raport": {
+          "id": 2,
+          "path": "/uploads/1/uuid-raport.pdf",
+          "status": "DITERIMA",
+          "keterangan": null,
+          "updated_at": "2026-05-03T11:00:00Z"
+        }
+      }
+    }
+  ]
+}</code></pre>
+            </article>
+
+            <!-- ============================================== -->
+            <!-- USERS ENDPOINTS -->
+            <!-- ============================================== -->
+            <div class="flex items-center gap-4 mb-8 mt-12">
+                <h2 class="text-3xl font-bold text-slate-900">Users</h2>
+                <div class="h-px bg-slate-200 flex-1"></div>
+            </div>
+
+            <!-- Endpoint: Users All / Filter -->
+            <article id="users-all" class="endpoint-card">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="method-badge method-get">GET</span>
+                    <h3 class="text-xl font-bold font-mono text-slate-800">/users</h3>
+                    <div class="ml-auto flex gap-2">
+                        <span class="auth-badge public">
+                            Public
+                        </span>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 mb-6">Melihat data diri ringkas daftar siswa yang sudah terdaftar. Dapat difilter berdasarkan jurusan yang dipilih.</p>
+
+                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Query Parameters <span class="text-slate-400 font-normal lowercase">(Optional)</span></h4>
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-slate-700">jurusan</td>
+                            <td class="text-slate-500">String</td>
+                            <td>Filter berdasarkan jurusan. Contoh: <code>/users?jurusan=RPL</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
+                    <span>Response</span>
+                    <span class="text-blue-600">200 OK</span>
+                </h4>
+<pre><code>{
+  "status": true,
+  "message": "Berhasil mengambil data siswa jurusan RPL",
+  "metadata": {
+    "statusCode": 200,
+    "length": 1
+  },
+  "data": [
+    {
+      "idUser": 1,
+      "no_daftar": "SPMB-123456",
+      "email": "siswa@example.com",
+      "nama": "Nama Siswa",
+      "jurusan": "RPL",
+      "no_hp": "08123456789",
+      "nisn": "1234567890",
+      "asal_sekolah": "SMP 1",
+      "alamat": "Jl. Mawar"
+    }
+  ]
+}</code></pre>
+            </article>
+
+            <!-- Footer -->
+            <footer class="mt-20 pt-8 border-t border-slate-200 text-center text-slate-500 text-sm pb-12">
+                <p>&copy; 2026 PPDB SMK. Generated API Documentation.</p>
+            </footer>
+
+        </div>
+    </main>
+
+    <!-- Script to handle active sidebar states -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section, article');
+            const navLinks = document.querySelectorAll('.sidebar-link');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
