@@ -17,6 +17,7 @@ model students {
   asal_sekolah        String
   akreditasi_sekolah  String
   alamat              String
+  foto                String?
   jurusan             Jurusan
   created_at          DateTime           @default(now())
   verification_status VerificationStatus @default(BELUM_SUBMIT)
@@ -55,6 +56,15 @@ model user {
   createdAt DateTime  @default(now())
   role      user_role @default(USER)
   students  students?
+}
+
+model test_schedules {
+  id           Int      @id @default(autoincrement())
+  tanggal_test DateTime
+  jam_test     String
+  lokasi_test  String
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }
 
 enum VerificationStatus {
@@ -108,3 +118,4 @@ model RaporScore {
   @@unique([id_student], map: "rapor_scores_id_student_unique")
   @@index([id_student], map: "rapor_scores_id_student_fkey")
 }
+
