@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    container_name: ppdb_backend
+    restart: always
+    ports:
+      - '3001:3000'
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    command: sh -c "npx prisma migrate deploy && node dist/main"
+    volumes:
+      - ./uploads:/app/uploads
+
+  mysql:
+    image: mysql:8
+    container_name: ppdb_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: arief140105
+      MYSQL_DATABASE: ppdb_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

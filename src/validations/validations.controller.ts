@@ -15,7 +15,6 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { user_role } from '../../generated/prisma/client';
 
-
 @Controller('validations')
 @UseGuards(AuthGuard, RolesGuard)
 export class ValidationsController {
@@ -49,7 +48,9 @@ export class ValidationsController {
     @Param('studentId', ParseIntPipe) studentId: number,
     @Body() bulkValidateDto: BulkValidateDocumentsDto,
   ) {
-    return this.validationsService.bulkValidateDocuments(studentId, bulkValidateDto);
+    return this.validationsService.bulkValidateDocuments(
+      studentId,
+      bulkValidateDto,
+    );
   }
-  }
-
+}
