@@ -20,9 +20,34 @@ interface CardTemplateData {
 }
 
 export function generateCardHtml(data: CardTemplateData): string {
-  // Placeholder foto jika belum ada
-  const fotoHtml = data.foto
-    ? `<img src="${data.foto}" alt="Foto Peserta" class="foto-peserta" />`
+  // Konversi foto peserta ke base64 data URI agar Puppeteer bisa me-render secara offline/lokal
+  let fotoDataUri = '';
+  if (data.foto) {
+    try {
+      let relativePath = '';
+      if (data.foto.startsWith('http')) {
+        const urlObj = new URL(data.foto);
+        relativePath = urlObj.pathname.replace(/^\/files/, 'uploads');
+      } else {
+        relativePath = data.foto.replace(/^\/files/, 'uploads').replace(/^\/uploads/, 'uploads');
+      }
+      
+      const fotoPath = path.join(process.cwd(), relativePath);
+      if (fs.existsSync(fotoPath)) {
+        const fotoBuffer = fs.readFileSync(fotoPath);
+        const ext = path.extname(fotoPath).toLowerCase();
+        const mimeType = ext === '.png' ? 'image/png' : ext === '.gif' ? 'image/gif' : 'image/jpeg';
+        fotoDataUri = `data:${mimeType};base64,${fotoBuffer.toString('base64')}`;
+      } else {
+        console.warn('Foto tidak ditemukan di path lokal:', fotoPath);
+      }
+    } catch (e) {
+      console.warn('Gagal membaca file foto untuk template:', e);
+    }
+  }
+
+  const fotoHtml = fotoDataUri
+    ? `<img src="${fotoDataUri}" alt="Foto Peserta" class="foto-peserta" />`
     : `<div class="foto-placeholder">
         <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>

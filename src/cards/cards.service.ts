@@ -46,12 +46,21 @@ export class CardsService {
           id: true,
           no_daftar: true,
           nama: true,
-          foto: true,
           jurusan: true,
           nisn: true,
           asal_sekolah: true,
           alamat: true,
           verification_status: true,
+          documents: {
+            where: {
+              document_type: {
+                name: 'pas_foto',
+              },
+            },
+            select: {
+              file_path: true,
+            },
+          },
         },
       });
 
@@ -80,13 +89,19 @@ export class CardsService {
       }
 
       // 4. Return data kartu
+      const pasFotoDoc = student.documents?.[0];
+      const pasFotoPath = pasFotoDoc ? pasFotoDoc.file_path : null;
+      const fotoUrl = pasFotoPath
+        ? `${process.env.BASE_URL || 'http://localhost:3000'}${pasFotoPath.replace(/^\/uploads/, '/files')}`
+        : null;
+
       return {
         success: true,
         message: 'Kartu pendaftaran berhasil diambil',
         data: {
           no_daftar: student.no_daftar,
           nama: student.nama,
-          foto: student.foto,
+          foto: fotoUrl,
           jurusan: student.jurusan,
           nisn: student.nisn,
           asal_sekolah: student.asal_sekolah,
@@ -113,12 +128,21 @@ export class CardsService {
         select: {
           no_daftar: true,
           nama: true,
-          foto: true,
           jurusan: true,
           nisn: true,
           asal_sekolah: true,
           alamat: true,
           verification_status: true,
+          documents: {
+            where: {
+              document_type: {
+                name: 'pas_foto',
+              },
+            },
+            select: {
+              file_path: true,
+            },
+          },
         },
       });
 
@@ -145,8 +169,10 @@ export class CardsService {
       }
 
       // 4. Buat foto URL lengkap atau null
-      const fotoUrl = student.foto
-        ? `${process.env.BASE_URL || 'http://localhost:3000'}/files/${student.foto}`
+      const pasFotoDoc = student.documents?.[0];
+      const pasFotoPath = pasFotoDoc ? pasFotoDoc.file_path : null;
+      const fotoUrl = pasFotoPath
+        ? `${process.env.BASE_URL || 'http://localhost:3000'}${pasFotoPath.replace(/^\/uploads/, '/files')}`
         : null;
 
       // 5. Generate HTML dari template

@@ -1,748 +1,1411 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dokumentasi API - PPDB SMK</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6', // Blue 500
-                        secondary: '#64748b', // Slate 500
-                        dark: '#0f172a', // Slate 900
-                        light: '#f8fafc', // Slate 50
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-                        mono: ['Fira Code', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            color: #334155;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            color: #0f172a;
-        }
-        pre {
-            font-family: 'Fira Code', monospace;
-            background-color: #1e293b;
-            color: #e2e8f0;
-            padding: 1.25rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            margin-top: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        code {
-            font-family: 'Fira Code', monospace;
-            background-color: #f1f5f9;
-            color: #0f172a;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-size: 0.875em;
-        }
-        pre code {
-            background-color: transparent;
-            color: inherit;
-            padding: 0;
-            font-size: 1em;
-        }
-        .method-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.375rem;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .method-get { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
-        .method-post { background-color: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-        .method-patch { background-color: #fefce8; color: #ca8a04; border: 1px solid #fef08a; }
-        .method-delete { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-        
-        .endpoint-card {
-            background-color: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            padding: 2rem;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            transition: all 0.2s ease-in-out;
-            scroll-margin-top: 5rem;
-        }
-        .endpoint-card:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border-color: #cbd5e1;
-        }
-        
-        .sidebar-link {
-            display: block;
-            padding: 0.5rem 1rem;
-            color: #64748b;
-            font-size: 0.875rem;
-            font-weight: 500;
-            border-radius: 0.375rem;
-            transition: all 0.15s ease;
-            margin-bottom: 0.25rem;
-            text-decoration: none;
-        }
-        .sidebar-link:hover, .sidebar-link.active {
-            background-color: #f1f5f9;
-            color: #0f172a;
-        }
-        
-        .auth-badge {
-            display: inline-flex;
-            align-items: center;
-            font-size: 0.75rem;
-            font-weight: 500;
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
-            border: 1px solid #e2e8f0;
-            background-color: #f8fafc;
-            color: #64748b;
-            gap: 0.25rem;
-        }
-        .auth-badge.required {
-            border-color: #fecaca;
-            background-color: #fef2f2;
-            color: #b91c1c;
-        }
-        .auth-badge.admin {
-            border-color: #e0e7ff;
-            background-color: #eef2ff;
-            color: #4338ca;
-        }
-        .auth-badge.public {
-            border-color: #dcfce3;
-            background-color: #f0fdf4;
-            color: #15803d;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPDB API Documentation</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-        .table-custom {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
-        }
-        .table-custom th, .table-custom td {
-            border: 1px solid #e2e8f0;
-            padding: 0.75rem 1rem;
-            text-align: left;
-        }
-        .table-custom th {
-            background-color: #f8fafc;
-            font-weight: 600;
-            color: #475569;
-        }
-        .table-custom tr:nth-child(even) {
-            background-color: #fcfcfd;
-        }
-        
-        /* Smooth scrollbar for sidebar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              200: '#b9dbfe',
+              300: '#7cc0fd',
+              400: '#369ffa',
+              500: '#0c83eb',
+              600: '#0066ca',
+              700: '#0252a3',
+              800: '#064687',
+              900: '#0b3b6f',
+              950: '#07254a',
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(59, 130, 246, 0.5);
+    }
+
+    /* Glassmorphism Styles */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glass-card {
+      background: rgba(30, 41, 59, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(59, 130, 246, 0.25);
+      box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Gradient Background Animation */
+    @keyframes gradient-flow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .animated-bg {
+      background: linear-gradient(-45deg, #051429, #0a192f, #112240, #0d1b2a);
+      background-size: 400% 400%;
+      animation: gradient-flow 15s ease infinite;
+    }
+
+    /* Active navigation highlight */
+    .nav-active {
+      color: #3b82f6 !important;
+      background: rgba(59, 130, 246, 0.08);
+      border-right: 2px solid #3b82f6;
+    }
+
+    /* Code Block tokens */
+    .token-keyword { color: #f472b6; }
+    .token-string { color: #34d399; }
+    .token-number { color: #fb923c; }
+    .token-boolean { color: #818cf8; }
+    .token-key { color: #60a5fa; }
+  </style>
 </head>
-<body class="antialiased flex h-screen overflow-hidden">
+<body class="animated-bg text-slate-100 min-h-screen font-sans selection:bg-blue-500/30 selection:text-blue-200 antialiased">
 
-    <!-- Sidebar -->
-    <aside class="w-72 flex-shrink-0 bg-white border-r border-slate-200 h-full overflow-y-auto flex flex-col hidden lg:flex">
-        <div class="h-16 flex items-center px-6 border-b border-slate-200 sticky top-0 bg-white z-10">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm">
-                    API
-                </div>
-                <h1 class="text-lg font-bold text-dark tracking-tight">PPDB SMK Docs</h1>
-            </div>
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-40 w-full glass-panel border-b border-white/5 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+        <i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="font-extrabold text-lg tracking-wider bg-gradient-to-r from-blue-400 via-indigo-200 to-white bg-clip-text text-transparent">PPDB API Docs</span>
+          <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">v1.0.0</span>
         </div>
-        <div class="p-4 flex-1">
-            <nav>
-                <div class="mb-8">
-                    <h2 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">General</h2>
-                    <a href="#getting-started" class="sidebar-link">Getting Started</a>
-                    <a href="#authentication-guide" class="sidebar-link">Authentication Guide</a>
-                </div>
-                
-                <div class="mb-8">
-                    <h2 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Auth Endpoints</h2>
-                    <a href="#auth-register" class="sidebar-link flex items-center justify-between"><span>Register</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
-                    <a href="#auth-login" class="sidebar-link flex items-center justify-between"><span>Login</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
-                    <a href="#auth-register-admin" class="sidebar-link flex items-center justify-between"><span>Register Admin</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
-                    <a href="#auth-login-admin" class="sidebar-link flex items-center justify-between"><span>Login Admin</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
-                </div>
+        <p class="text-xs text-slate-400">Penerimaan Peserta Didik Baru Service Documentation</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-900/60 border border-white/5 text-xs text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="font-semibold text-slate-200">SERVER:</span>
+        <code class="text-blue-400 select-all font-mono">http://localhost:3000/api</code>
+      </div>
+    </div>
+  </header>
 
-                <div class="mb-8">
-                    <h2 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Berkas Endpoints</h2>
-                    <a href="#berkas-upload" class="sidebar-link flex items-center justify-between"><span>Upload Berkas</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">POST</span></a>
-                    <a href="#berkas-edit" class="sidebar-link flex items-center justify-between"><span>Edit Berkas</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">PATCH</span></a>
-                    <a href="#berkas-all" class="sidebar-link flex items-center justify-between"><span>Semua Berkas</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">GET</span></a>
-                </div>
-
-                <div class="mb-8">
-                    <h2 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Users Endpoints</h2>
-                    <a href="#users-all" class="sidebar-link flex items-center justify-between"><span>Daftar Siswa</span> <span class="text-[0.65rem] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">GET</span></a>
-                </div>
-            </nav>
+  <div class="max-w-[1600px] mx-auto flex min-h-[calc(100vh-73px)] relative">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-80 border-r border-white/5 shrink-0 hidden lg:block sticky top-[73px] h-[calc(100vh-73px)] overflow-y-auto px-4 py-6 bg-slate-950/45 backdrop-blur-md">
+      
+      <!-- Interactive Role Filtering Tabs -->
+      <div class="mb-4">
+        <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500 mb-2 px-1">PERSPEKTIF PORTAL</div>
+        <div class="flex p-1 bg-slate-950/80 border border-white/10 rounded-xl text-xs gap-1">
+          <button onclick="setRoleFilter('all')" id="tab-all" class="flex-1 py-1.5 rounded-lg text-center font-medium transition-all bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md">
+            Semua
+          </button>
+          <button onclick="setRoleFilter('user')" id="tab-user" class="flex-1 py-1.5 rounded-lg text-center font-medium transition-all text-slate-400 hover:text-slate-200">
+            Siswa
+          </button>
+          <button onclick="setRoleFilter('admin')" id="tab-admin" class="flex-1 py-1.5 rounded-lg text-center font-medium transition-all text-slate-400 hover:text-slate-200">
+            Admin
+          </button>
         </div>
+      </div>
+
+      <!-- Search Input -->
+      <div class="relative mb-6">
+        <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
+        <input 
+          id="endpoint-search"
+          type="text" 
+          placeholder="Cari endpoint..." 
+          class="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-slate-950/80 border border-white/10 focus:outline-none focus:border-blue-500/50 transition-colors text-slate-200 placeholder-slate-500"
+        />
+      </div>
+
+      <!-- Navigation list -->
+      <nav class="space-y-6 text-sm" id="sidebar-nav">
+        <div>
+          <h3 class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2 px-2">Overview</h3>
+          <ul class="space-y-1">
+            <li>
+              <a href="#introduction" class="flex items-center space-x-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                <i data-lucide="info" class="w-4 h-4 text-slate-400"></i>
+                <span>Pengantar</span>
+              </a>
+            </li>
+            <li>
+              <a href="#authentication" class="flex items-center space-x-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                <i data-lucide="shield-check" class="w-4 h-4 text-slate-400"></i>
+                <span>Otentikasi JWT</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- PORTAL CALON SISWA (USER ROLE) -->
+        <div id="section-user-endpoints" class="space-y-6 role-section">
+          <div class="flex items-center justify-between px-2 mb-1 border-b border-blue-500/10 pb-1">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-blue-400 flex items-center">
+              <i data-lucide="user" class="w-3.5 h-3.5 mr-1 text-blue-400"></i>
+              Portal Siswa (User)
+            </span>
+          </div>
+
+          <!-- Auth Group -->
+          <div class="module-group" data-module="user-auth">
+            <span class="text-[9px] uppercase font-semibold text-slate-500 px-2 block mb-1">Akun & Auth Siswa</span>
+            <ul class="space-y-1 text-xs">
+              <li class="sidebar-item" data-search-term="post auth register siswa user">
+                <a href="#auth-register" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Register Akun</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="post auth login siswa user">
+                <a href="#auth-login" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Login Akun</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Berkas Group -->
+          <div class="module-group" data-module="user-berkas">
+            <span class="text-[9px] uppercase font-semibold text-slate-500 px-2 block mb-1">Pendaftaran & Berkas</span>
+            <ul class="space-y-1 text-xs">
+              <li class="sidebar-item" data-search-term="post berkas upload files">
+                <a href="#berkas-upload" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Submit Biodata & Berkas</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="patch berkas edit update files">
+                <a href="#berkas-edit" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Edit Biodata & Berkas</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-orange-500/20 text-orange-300">PATCH</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="get berkas all list berkas">
+                <a href="#berkas-all" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Lihat Semua Berkas Saya</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-emerald-500/20 text-emerald-300">GET</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Status & Kartu Group -->
+          <div class="module-group" data-module="user-status">
+            <span class="text-[9px] uppercase font-semibold text-slate-500 px-2 block mb-1">Kartu & Status Kelulusan</span>
+            <ul class="space-y-1 text-xs">
+              <li class="sidebar-item" data-search-term="get cards me info">
+                <a href="#cards-me" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Lihat Kartu Ujian</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-emerald-500/20 text-emerald-300">GET</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="get cards me download pdf">
+                <a href="#cards-me-download" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Unduh Kartu PDF</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-emerald-500/20 text-emerald-300">GET</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="get users registration status">
+                <a href="#users-registration-status" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Status Verifikasi</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-emerald-500/20 text-emerald-300">GET</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- PORTAL PANITIA (ADMIN ROLE) -->
+        <div id="section-admin-endpoints" class="space-y-6 role-section">
+          <div class="flex items-center justify-between px-2 mb-1 border-b border-indigo-500/20 pb-1">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-400 flex items-center">
+              <i data-lucide="shield" class="w-3.5 h-3.5 mr-1 text-indigo-400"></i>
+              Portal Admin (Panitia)
+            </span>
+          </div>
+
+          <!-- Auth Group -->
+          <div class="module-group" data-module="admin-auth">
+            <span class="text-[9px] uppercase font-semibold text-slate-500 px-2 block mb-1">Auth Admin</span>
+            <ul class="space-y-1 text-xs">
+              <li class="sidebar-item" data-search-term="post auth register admin">
+                <a href="#auth-register-admin" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Register Admin</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="post auth login admin">
+                <a href="#auth-login-admin" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Login Admin</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Database Siswa Group -->
+          <div class="module-group" data-module="admin-siswa">
+            <span class="text-[9px] uppercase font-semibold text-slate-500 px-2 block mb-1">Database Siswa</span>
+            <ul class="space-y-1 text-xs">
+              <li class="sidebar-item" data-search-term="get users find by jurusan">
+                <a href="#users-find" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">List Pendaftar</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-emerald-500/20 text-emerald-300">GET</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Validasi Dokumen Group -->
+          <div class="module-group" data-module="admin-validasi">
+            <span class="text-[9px] uppercase font-semibold text-slate-500 px-2 block mb-1">Validasi Dokumen Fisik</span>
+            <ul class="space-y-1 text-xs">
+              <li class="sidebar-item" data-search-term="patch validations documents validate id">
+                <a href="#validations-single" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Verifikasi Single Dokumen</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-orange-500/20 text-orange-300">PATCH</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="patch validations students bulk validation">
+                <a href="#validations-bulk" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Bulk Verifikasi Dokumen</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-orange-500/20 text-orange-300">PATCH</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Input Rapor Group -->
+          <div class="module-group" data-module="admin-rapor">
+            <span class="text-[9px] uppercase font-semibold text-slate-500 px-2 block mb-1">Scoring Nilai Rapor</span>
+            <ul class="space-y-1 text-xs">
+              <li class="sidebar-item" data-search-term="post rapor-scores input">
+                <a href="#rapor-create" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Input Nilai Rapor</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="get rapor-scores list rank">
+                <a href="#rapor-findall" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">List Peringkat Kelulusan</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-emerald-500/20 text-emerald-300">GET</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="get rapor-scores detail id">
+                <a href="#rapor-findone" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Detail Rapor Siswa</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-emerald-500/20 text-emerald-300">GET</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="patch rapor-scores update edit">
+                <a href="#rapor-update" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Update Nilai Rapor</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-orange-500/20 text-orange-300">PATCH</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="delete rapor-scores remove">
+                <a href="#rapor-delete" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Hapus Nilai Rapor</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-red-500/20 text-red-300">DEL</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Ujian Group -->
+          <div class="module-group" data-module="admin-ujian">
+            <span class="text-[9px] uppercase font-semibold text-slate-500 px-2 block mb-1">Jadwal Ujian Calon Siswa</span>
+            <ul class="space-y-1 text-xs">
+              <li class="sidebar-item" data-search-term="post cards test-schedules create">
+                <a href="#cards-schedules-create" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Buat Jadwal Baru</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="get cards test-schedules list">
+                <a href="#cards-schedules-findall" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">List Jadwal Ujian</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-emerald-500/20 text-emerald-300">GET</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="patch cards test-schedules edit update">
+                <a href="#cards-schedules-update" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Edit Jadwal Ujian</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-orange-500/20 text-orange-300">PATCH</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="delete cards test-schedules delete">
+                <a href="#cards-schedules-delete" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Hapus Jadwal Ujian</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-red-500/20 text-red-300">DEL</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 h-full overflow-y-auto bg-slate-50 relative scroll-smooth">
-        <!-- Header Mobile -->
-        <header class="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center px-4 sticky top-0 z-20">
-            <h1 class="text-lg font-bold text-dark">API PPDB SMK</h1>
-        </header>
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 px-6 lg:px-12 py-10 overflow-y-auto space-y-12 max-w-full">
+      
+      <!-- HERO SECTION -->
+      <section id="introduction" class="glass-panel p-8 rounded-3xl relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
+        <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl"></div>
 
-        <div class="max-w-4xl mx-auto px-6 py-12 lg:px-12">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-3">
+            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+              <span>PPDB SMK API Engine v1.0.0</span>
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-blue-300 bg-clip-text text-transparent">
+              PPDB SMK API Engine
+            </h1>
+            <p class="text-slate-400 max-w-xl text-sm leading-relaxed">
+              Dokumentasi endpoint sistem PPDB online terintegrasi. Halaman ini dipisahkan secara terstruktur berdasarkan peran akses (Role): <strong>Calon Siswa (User)</strong> dan <strong>Panitia (Admin)</strong>.
+            </p>
+          </div>
+
+          <!-- Quick statistics -->
+          <div class="grid grid-cols-2 gap-3 min-w-[280px]">
+            <div class="p-4 rounded-2xl bg-slate-900/60 border border-white/5 flex flex-col justify-between">
+              <span class="text-xs text-slate-400 font-medium">Total Endpoints</span>
+              <span class="text-2xl font-bold text-blue-400 mt-1" id="stat-endpoints">22 API</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-900/60 border border-white/5 flex flex-col justify-between">
+              <span class="text-xs text-slate-400 font-medium">Portal / Role</span>
+              <span class="text-2xl font-bold text-indigo-400 mt-1">2 Role</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-900/60 border border-white/5 flex flex-col justify-between">
+              <span class="text-xs text-slate-400 font-medium">Secure Routes</span>
+              <span class="text-2xl font-bold text-emerald-400 mt-1" id="stat-secured">18 Route</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-900/60 border border-white/5 flex flex-col justify-between">
+              <span class="text-xs text-slate-400 font-medium">Status API</span>
+              <span class="text-2xl font-bold text-emerald-400 mt-1 flex items-center gap-1">
+                Active <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block animate-pulse"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-white/5 my-8">
+
+        <!-- Info Environment -->
+        <div class="grid md:grid-cols-3 gap-6 text-xs">
+          <div class="space-y-1">
+            <span class="text-slate-400 font-semibold block uppercase tracking-wider">Base URLs</span>
+            <div class="space-y-1 font-mono text-[11px]">
+              <div>Dev: <code class="text-blue-400 select-all bg-slate-900/60 px-1.5 py-0.5 rounded border border-white/5">http://localhost:3000/api</code></div>
+              <div>Staging: <code class="text-slate-500 bg-slate-900/60 px-1.5 py-0.5 rounded border border-white/5">https://api.ppdb.smk.sch.id/api</code></div>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <span class="text-slate-400 font-semibold block uppercase tracking-wider">Mekanisme Auth</span>
+            <p class="text-slate-300 leading-relaxed font-mono">Standard HTTP <code class="text-emerald-400">Bearer Token</code></p>
+            <p class="text-slate-300 leading-relaxed font-mono">Response Type: <code class="text-blue-400">application/json</code></p>
+          </div>
+          <div class="space-y-1">
+            <span class="text-slate-400 font-semibold block uppercase tracking-wider">Skema Role</span>
+            <div class="flex flex-wrap gap-2 mt-1">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/15">ROLE: USER (Siswa)</span>
+              <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/15">ROLE: ADMIN (Panitia)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUTHENTICATION DETAILS -->
+      <section id="authentication" class="space-y-4 scroll-mt-24">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+            <i data-lucide="key" class="w-4 h-4 text-blue-400"></i>
+          </div>
+          <h2 class="text-2xl font-bold">JWT Authentication</h2>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Hampir seluruh endpoint dalam sistem dilindungi menggunakan token <span class="text-blue-400 font-semibold">JWT (JSON Web Token)</span>. Untuk berinteraksi dengan API yang diamankan, sertakan token ke dalam header HTTP request:
+          </p>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">HTTP Header Example</span>
+              <div class="relative">
+                <button onclick="copyToClipboard('auth-header-code')" class="absolute top-2 right-2 p-1.5 rounded-lg bg-slate-900 border border-white/5 hover:bg-slate-800 transition-colors text-slate-400" title="Copy to clipboard">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+                <pre class="bg-slate-950/80 p-4 rounded-xl border border-white/5 font-mono text-[11px] overflow-x-auto text-blue-400 select-all" id="auth-header-code">Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiaGFyeUBleGFtcGxlLmNvbSIsInJvbGUiOiJVU0VSIn0...</pre>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Payload JWT Structure</span>
+              <pre class="bg-slate-950/80 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-emerald-400">{
+  <span class="text-blue-400">"sub"</span>: 1, <span class="text-slate-500">// User / Admin ID</span>
+  <span class="text-blue-400">"email"</span>: <span class="text-slate-300">"haris@example.com"</span>,
+  <span class="text-blue-400">"role"</span>: <span class="text-slate-300">"USER"</span> <span class="text-slate-500">// Nilai: "USER" atau "ADMIN"</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="border-white/5">
+
+      <!-- ============================================================== -->
+      <!-- SECTION: PORTAL CALON SISWA (USER ROLE ENDPOINTS) -->
+      <!-- ============================================================== -->
+      <div id="content-user-section" class="space-y-12 content-role-section">
+        <div class="border-b-2 border-blue-500/20 pb-3 flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+            <i data-lucide="user" class="w-5 h-5 text-blue-400"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-extrabold tracking-wide text-blue-400">PORTAL CALON SISWA (USER)</h2>
+            <p class="text-xs text-slate-400">Kumpulan API yang diakses oleh calon siswa untuk pendaftaran, manajemen berkas, dan kartu ujian.</p>
+          </div>
+        </div>
+
+        <!-- 1. POST Register Siswa -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="auth-register" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/auth/register</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-semibold border border-white/5">PUBLIC</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-5">
+              <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Deskripsi</h4>
+                <p class="text-sm text-slate-300">Pendaftaran akun baru untuk calon peserta didik baru (Siswa).</p>
+              </div>
+
+              <!-- Request Body -->
+              <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Request Body</h4>
+                <div class="border border-white/5 rounded-xl overflow-hidden">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr class="bg-slate-950/60 border-b border-white/5 text-slate-400">
+                        <th class="p-3">Field</th>
+                        <th class="p-3">Type</th>
+                        <th class="p-3">Requirement</th>
+                        <th class="p-3">Validasi</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                      <tr>
+                        <td class="p-3 font-mono text-blue-400">name</td>
+                        <td class="p-3 text-slate-300">string</td>
+                        <td class="p-3"><span class="text-red-400 font-semibold">Required</span></td>
+                        <td class="p-3 text-slate-400 font-mono text-[10px]">IsString(), IsNotEmpty()</td>
+                      </tr>
+                      <tr>
+                        <td class="p-3 font-mono text-blue-400">email</td>
+                        <td class="p-3 text-slate-300">string</td>
+                        <td class="p-3"><span class="text-red-400 font-semibold">Required</span></td>
+                        <td class="p-3 text-slate-400 font-mono text-[10px]">IsString(), IsNotEmpty(), Email</td>
+                      </tr>
+                      <tr>
+                        <td class="p-3 font-mono text-blue-400">password</td>
+                        <td class="p-3 text-slate-300">string</td>
+                        <td class="p-3"><span class="text-red-400 font-semibold">Required</span></td>
+                        <td class="p-3 text-slate-400 font-mono text-[10px]">IsString(), IsNotEmpty()</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="md:col-span-5 space-y-4">
+              <div class="space-y-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Payload JSON</span>
+                <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"name"</span>: <span class="token-string">"Haris Setiawan"</span>,
+  <span class="token-key">"email"</span>: <span class="token-string">"haris@example.com"</span>,
+  <span class="token-key">"password"</span>: <span class="token-string">"rahasia123"</span>
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. POST Login Siswa -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="auth-login" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/auth/login</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-semibold border border-white/5">PUBLIC</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-5">
+              <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Deskripsi</h4>
+                <p class="text-sm text-slate-300">Login untuk Calon Siswa guna mendapatkan token akses JWT. Hanya menerima user dengan role <code class="text-blue-400">USER</code>.</p>
+              </div>
+            </div>
+
+            <div class="md:col-span-5 space-y-4">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"status"</span>: <span class="token-boolean">true</span>,
+  <span class="token-key">"message"</span>: <span class="token-string">"Login berhasil"</span>,
+  <span class="token-key">"data"</span>: {
+    <span class="token-key">"id"</span>: <span class="token-number">1</span>,
+    <span class="token-key">"name"</span>: <span class="token-string">"Haris Setiawan"</span>,
+    <span class="token-key">"email"</span>: <span class="token-string">"haris@example.com"</span>,
+    <span class="token-key">"token"</span>: <span class="token-string">"eyJhbGciOiJIUz..."</span>
+  }
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. POST Upload Berkas Siswa -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="berkas-upload" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/berkas/upload</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: USER</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Deskripsi</h4>
+                <p class="text-sm text-slate-300">Menyimpan biodata pendaftar sekaligus berkas fisik. Menggunakan format payload <code class="text-blue-400">multipart/form-data</code>.</p>
+              </div>
+
+              <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Request Body (Form Fields)</h4>
+                <div class="border border-white/5 rounded-xl overflow-hidden">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr class="bg-slate-950/60 border-b border-white/5 text-slate-400">
+                        <th class="p-3">Field</th>
+                        <th class="p-3">Type</th>
+                        <th class="p-3">Requirement</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                      <tr>
+                        <td class="p-3 font-mono text-blue-400">nama, no_hp, nisn, asal_sekolah, akreditasi_sekolah, alamat</td>
+                        <td class="p-3 text-slate-300">string</td>
+                        <td class="p-3"><span class="text-red-400 font-semibold">Required</span></td>
+                      </tr>
+                      <tr>
+                        <td class="p-3 font-mono text-blue-400">jurusan</td>
+                        <td class="p-3 text-slate-300">Enum (Jurusan)</td>
+                        <td class="p-3"><span class="text-red-400 font-semibold">Required</span> (contoh: TKJ, RPL, AKL)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">File Fields (Max 5MB per file, PDF/JPG/PNG)</h4>
+                <div class="flex flex-wrap gap-1.5 text-[10px]">
+                  <span class="px-2 py-0.5 rounded bg-slate-950 border border-white/5 font-mono text-slate-300">surat_keterangan_lulus</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-950 border border-white/5 font-mono text-slate-300">raport</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-950 border border-white/5 font-mono text-slate-300">ktp_ayah</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-950 border border-white/5 font-mono text-slate-300">ktp_ibu</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-950 border border-white/5 font-mono text-slate-300">kartu_keluarga</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-950 border border-white/5 font-mono text-slate-300">akta_kelahiran</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-950 border border-white/5 font-mono text-slate-300">pas_foto</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-950 border border-white/5 font-mono text-slate-300">sptjm</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="md:col-span-5">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">cURL Upload</span>
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-blue-300 whitespace-pre-wrap break-all">curl -X POST http://localhost:3000/api/berkas/upload \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: multipart/form-data" \
+  -F "nama=Haris" -F "nisn=00223" -F "jurusan=RPL" \
+  -F "raport=@/path/to/raport.pdf"</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. PATCH Edit Berkas Siswa -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="berkas-edit" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 font-mono text-xs font-bold border border-orange-500/30">PATCH</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/berkas/edit</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: USER</span>
+            </div>
+          </div>
+          
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Digunakan untuk memperbarui berkas yang berstatus REVISI atau REJECTED, atau merubah biodata pendaftaran.</p>
+          </div>
+        </div>
+
+        <!-- 5. GET All Berkas Siswa -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="berkas-all" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">GET</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/berkas/all-berkas</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: USER</span>
+            </div>
+          </div>
+          
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Menampilkan status verifikasi dan tautan berkas yang telah dikirim oleh siswa yang sedang login.</p>
+          </div>
+        </div>
+
+        <!-- 6. GET Cards Me -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="cards-me" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">GET</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/cards/me</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: USER</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7">
+              <p class="text-sm text-slate-300">Melihat detail kartu peserta ujian pendaftaran miliknya, seperti tanggal ujian, jam, dan lokasi ruangan.</p>
+            </div>
+            <div class="md:col-span-5">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"no_daftar"</span>: <span class="token-string">"PPDB-2026-0001"</span>,
+  <span class="token-key">"tanggal_test"</span>: <span class="token-string">"2026-06-15"</span>,
+  <span class="token-key">"jam_test"</span>: <span class="token-string">"08:00 - 10:00"</span>,
+  <span class="token-key">"lokasi_test"</span>: <span class="token-string">"Laboratorium TKJ 1"</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. GET Cards Download PDF -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="cards-me-download" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">GET</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/cards/me/download</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: USER</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Mengunduh file PDF Kartu Ujian pendaftaran secara dinamis.</p>
+          </div>
+        </div>
+
+        <!-- 8. GET Registration Status -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="users-registration-status" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">GET</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/users/registration-status</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: USER</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7">
+              <p class="text-sm text-slate-300">Mengetahui status akhir verifikasi berkas pendaftaran (VERIFIED / REVISI / REJECTED) beserta catatan detail dari Panitia Admin.</p>
+            </div>
+            <div class="md:col-span-5">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"success"</span>: <span class="token-boolean">true</span>,
+  <span class="token-key">"data"</span>: {
+    <span class="token-key">"verification_status"</span>: <span class="token-string">"REVISI"</span>,
+    <span class="token-key">"documents_need_revision"</span>: [
+      {
+        <span class="token-key">"id"</span>: <span class="token-string">"doc-123"</span>,
+        <span class="token-key">"type"</span>: <span class="token-string">"raport"</span>,
+        <span class="token-key">"keterangan"</span>: <span class="token-string">"Nilai semester 3 salah input"</span>
+      }
+    ]
+  }
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="border-white/5">
+
+      <!-- ============================================================== -->
+      <!-- SECTION: PORTAL PANITIA (ADMIN ROLE ENDPOINTS) -->
+      <!-- ============================================================== -->
+      <div id="content-admin-section" class="space-y-12 content-role-section">
+        <div class="border-b-2 border-indigo-500/20 pb-3 flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+            <i data-lucide="shield" class="w-5 h-5 text-indigo-400"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-extrabold tracking-wide text-indigo-400">PORTAL PANITIA (ADMIN)</h2>
+            <p class="text-xs text-slate-400">Kumpulan API pengelolaan pendaftaran, validasi berkas fisik, scoring rata-rata rapor, dan penjadwalan ujian seleksi.</p>
+          </div>
+        </div>
+
+        <!-- 1. POST Register Admin -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="auth-register-admin" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/auth/register-admin</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-semibold border border-white/5">PUBLIC</span>
+            </div>
+          </div>
+          
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Pendaftaran akun panitia administrator baru dengan hak akses pengolahan data.</p>
+          </div>
+        </div>
+
+        <!-- 2. POST Login Admin -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="auth-login-admin" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/auth/login-admin</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-semibold border border-white/5">PUBLIC</span>
+            </div>
+          </div>
+          
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Autentikasi khusus user Admin. Menghasilkan JWT token dengan role <code class="text-indigo-400">ADMIN</code>.</p>
+          </div>
+        </div>
+
+        <!-- 3. GET List Pendaftar -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="users-find" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">GET</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/users</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-semibold border border-white/5 font-mono">PUBLIC/ADMIN</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <p class="text-sm text-slate-300">Melihat daftar seluruh data siswa pendaftar. Mendukung pencarian berdasar filter jurusan.</p>
+              
+              <div class="border border-white/5 rounded-xl overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="bg-slate-950/60 border-b border-white/5 text-slate-400">
+                      <th class="p-3">Query Parameter</th>
+                      <th class="p-3">Type</th>
+                      <th class="p-3">Keterangan</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr>
+                      <td class="p-3 font-mono text-blue-400">jurusan</td>
+                      <td class="p-3 text-slate-300">string</td>
+                      <td class="p-3 text-slate-400">Optional. Contoh: <code class="text-blue-300">TKJ</code> atau <code class="text-blue-300">RPL</code>.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
             
-            <!-- Section: Getting Started -->
-            <section id="getting-started" class="mb-16 scroll-mt-20">
-                <h1 class="text-4xl font-extrabold text-slate-900 mb-4">Dokumentasi API PPDB SMK</h1>
-                <p class="text-lg text-slate-600 mb-8 leading-relaxed">
-                    Selamat datang di dokumentasi resmi API Pendaftaran Peserta Didik Baru (PPDB) SMK. API ini dibangun dengan framework <strong>NestJS</strong> dan dirancang sedemikian rupa agar mudah diintegrasikan dengan aplikasi Frontend Anda.
-                </p>
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 flex gap-4 text-blue-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 text-blue-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div>
-                        <h4 class="font-semibold text-blue-900 mb-1">Base URL</h4>
-                        <p class="text-sm">Semua endpoint API pada dokumentasi ini merujuk secara relatif pada URL server utama Anda, contohnya: <code>http://localhost:3000</code>.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section: Authentication Guide -->
-            <section id="authentication-guide" class="mb-16 scroll-mt-20">
-                <h2 class="text-2xl font-bold text-slate-900 mb-4 border-b border-slate-200 pb-2">Panduan Autentikasi (Authorization)</h2>
-                <p class="text-slate-600 mb-4">
-                    Beberapa endpoint dalam API ini bersifat <em>protected</em> (dilindungi) dan memerlukan otentikasi menggunakan metode <strong>JWT (JSON Web Token)</strong>. 
-                </p>
-                
-                <h3 class="text-lg font-semibold mt-6 mb-2">Bagaimana cara kerjanya?</h3>
-                <ol class="list-decimal list-inside space-y-2 text-slate-600 mb-6 ml-2">
-                    <li>Kirim request login ke endpoint <code>/auth/login</code> (untuk siswa) atau <code>/auth/login-admin</code> (untuk admin).</li>
-                    <li>Jika berhasil, server akan mengembalikan data beserta properti <code>token</code>.</li>
-                    <li>Sematkan token tersebut pada <strong>HTTP Headers</strong> di setiap request yang membutuhkan otorisasi.</li>
-                </ol>
-
-                <div class="bg-white border border-slate-200 rounded-lg p-5 mb-4 shadow-sm">
-                    <h4 class="font-medium text-sm text-slate-500 uppercase tracking-wider mb-2">Format Header Request</h4>
-                    <pre class="m-0"><code>Authorization: Bearer &lt;token_anda_disini&gt;</code></pre>
-                </div>
-
-                <div class="bg-amber-50 border border-amber-200 rounded-lg p-5 flex gap-4 text-amber-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 text-amber-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <div>
-                        <h4 class="font-semibold text-amber-900 mb-1">Penting</h4>
-                        <p class="text-sm">Hak akses (Role) dibedakan menjadi <strong>USER</strong> (siswa) dan <strong>ADMIN</strong>. Beberapa endpoint tertentu seperti <code>/berkas/all-berkas</code> akan secara spesifik menolak request jika token yang digunakan bukan milik Admin (mengembalikan status 403 Forbidden).</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ============================================== -->
-            <!-- AUTH ENDPOINTS -->
-            <!-- ============================================== -->
-            <div class="flex items-center gap-4 mb-8 mt-12">
-                <h2 class="text-3xl font-bold text-slate-900">Authentication</h2>
-                <div class="h-px bg-slate-200 flex-1"></div>
-            </div>
-
-            <!-- Endpoint: Register -->
-            <article id="auth-register" class="endpoint-card">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <span class="method-badge method-post">POST</span>
-                    <h3 class="text-xl font-bold font-mono text-slate-800">/auth/register</h3>
-                    <div class="ml-auto flex gap-2">
-                        <span class="auth-badge public">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
-                            Public
-                        </span>
-                    </div>
-                </div>
-                
-                <p class="text-slate-600 mb-6">Mendaftarkan akun baru untuk pendaftar/siswa.</p>
-
-                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Request Body <span class="text-slate-400 font-normal lowercase">(application/json)</span></h4>
-                <table class="table-custom">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Keterangan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="font-mono text-slate-700">name</td>
-                            <td class="text-slate-500">String</td>
-                            <td>Nama lengkap pendaftar (wajib)</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">email</td>
-                            <td class="text-slate-500">String</td>
-                            <td>Alamat email unik (wajib)</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">password</td>
-                            <td class="text-slate-500">String</td>
-                            <td>Kata sandi akun (wajib)</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
-                    <span>Response</span>
-                    <span class="text-green-600">201 Created</span>
-                </h4>
-<pre><code>{
-  "status": true,
-  "message": "Pendaftaran berhasil"
-}</code></pre>
-            </article>
-
-            <!-- Endpoint: Login -->
-            <article id="auth-login" class="endpoint-card">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <span class="method-badge method-post">POST</span>
-                    <h3 class="text-xl font-bold font-mono text-slate-800">/auth/login</h3>
-                    <div class="ml-auto flex gap-2">
-                        <span class="auth-badge public">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
-                            Public
-                        </span>
-                    </div>
-                </div>
-                
-                <p class="text-slate-600 mb-6">Masuk ke akun siswa dan mendapatkan JWT Token.</p>
-
-                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Request Body <span class="text-slate-400 font-normal lowercase">(application/json)</span></h4>
-<pre><code>{
-  "email": "siswa@example.com",
-  "password": "password123"
-}</code></pre>
-
-                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
-                    <span>Response</span>
-                    <span class="text-blue-600">200 OK</span>
-                </h4>
-<pre><code>{
-  "status": true,
-  "message": "Login berhasil",
-  "data": {
-    "id": 1,
-    "name": "Nama Siswa",
-    "email": "siswa@example.com",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}</code></pre>
-            </article>
-
-            <!-- Endpoint: Register Admin -->
-            <article id="auth-register-admin" class="endpoint-card">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <span class="method-badge method-post">POST</span>
-                    <h3 class="text-xl font-bold font-mono text-slate-800">/auth/register-admin</h3>
-                    <div class="ml-auto flex gap-2">
-                        <span class="auth-badge public">
-                            Public
-                        </span>
-                    </div>
-                </div>
-                
-                <p class="text-slate-600 mb-6">Mendaftarkan akun baru yang secara otomatis diberikan <em>role</em> <strong>ADMIN</strong>.</p>
-                <p class="text-sm text-slate-500 mb-4 bg-slate-50 p-3 rounded-md border border-slate-100">Request parameter dan format response identik dengan endpoint <code>/auth/register</code> biasa.</p>
-            </article>
-
-            <!-- Endpoint: Login Admin -->
-            <article id="auth-login-admin" class="endpoint-card">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <span class="method-badge method-post">POST</span>
-                    <h3 class="text-xl font-bold font-mono text-slate-800">/auth/login-admin</h3>
-                    <div class="ml-auto flex gap-2">
-                        <span class="auth-badge public">
-                            Public
-                        </span>
-                    </div>
-                </div>
-                
-                <p class="text-slate-600 mb-6">Masuk ke sistem khusus untuk akun ber-role <strong>ADMIN</strong>. Akan mengembalikan Error 401 jika login menggunakan akun siswa.</p>
-                <p class="text-sm text-slate-500 mb-4 bg-slate-50 p-3 rounded-md border border-slate-100">Request parameter dan format response identik dengan endpoint <code>/auth/login</code> biasa.</p>
-            </article>
-
-            <!-- ============================================== -->
-            <!-- BERKAS ENDPOINTS -->
-            <!-- ============================================== -->
-            <div class="flex items-center gap-4 mb-8 mt-12">
-                <h2 class="text-3xl font-bold text-slate-900">Upload Berkas</h2>
-                <div class="h-px bg-slate-200 flex-1"></div>
-            </div>
-
-            <!-- Endpoint: Upload Berkas -->
-            <article id="berkas-upload" class="endpoint-card">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <span class="method-badge method-post">POST</span>
-                    <h3 class="text-xl font-bold font-mono text-slate-800">/berkas/upload</h3>
-                    <div class="ml-auto flex gap-2">
-                        <span class="auth-badge required">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            Auth Required
-                        </span>
-                    </div>
-                </div>
-                
-                <p class="text-slate-600 mb-6">Menyimpan data pendaftaran siswa dan mengupload file dokumen pendukung secara bersamaan.</p>
-
-                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Request Form Data <span class="text-slate-400 font-normal lowercase">(multipart/form-data)</span></h4>
-                <table class="table-custom">
-                    <thead>
-                        <tr>
-                            <th>Key</th>
-                            <th>Type</th>
-                            <th>Keterangan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="font-mono text-slate-700">nama</td>
-                            <td class="text-slate-500">Text</td>
-                            <td>Nama lengkap siswa</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">no_hp</td>
-                            <td class="text-slate-500">Text</td>
-                            <td>Nomor Handphone yang bisa dihubungi</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">nisn</td>
-                            <td class="text-slate-500">Text</td>
-                            <td>Nomor Induk Siswa Nasional</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">asal_sekolah</td>
-                            <td class="text-slate-500">Text</td>
-                            <td>Nama sekolah sebelumnya</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">alamat</td>
-                            <td class="text-slate-500">Text</td>
-                            <td>Alamat domisili lengkap</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">jurusan</td>
-                            <td class="text-slate-500">Text/Enum</td>
-                            <td>Jurusan yang dipilih (sesuai enum Prisma)</td>
-                        </tr>
-                        <tr>
-                            <td colspan="3" class="bg-slate-50 font-semibold text-slate-700 text-center text-xs uppercase tracking-wider py-2">Attachment Files (Max 5MB per file, Format: PDF/JPG/PNG)</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">surat_keterangan_lulus</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Scan Surat Keterangan Lulus (SKL)</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">raport</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Scan Raport Sekolah</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">ktp_ayah</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Scan KTP Ayah</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">ktp_ibu</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Scan KTP Ibu</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">kartu_keluarga</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Scan Kartu Keluarga (KK)</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">akta_kelahiran</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Scan Akta Kelahiran</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">pas_foto</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Pas Foto Formal</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">sptjm</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Surat Pernyataan Tanggung Jawab Mutlak</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">kip</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Kartu Indonesia Pintar (Opsional)</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">paiagam</td>
-                            <td class="text-slate-500">File</td>
-                            <td>Piagam Penghargaan (Opsional)</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">sk_osis</td>
-                            <td class="text-slate-500">File</td>
-                            <td>SK Pengurus OSIS (Opsional)</td>
-                        </tr>
-                        <tr>
-                            <td class="font-mono text-slate-700">sk_pramuka</td>
-                            <td class="text-slate-500">File</td>
-                            <td>SK Pramuka (Opsional)</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
-                    <span>Response</span>
-                    <span class="text-green-600">201 Created</span>
-                </h4>
-<pre><code>{
-  "status": true,
-  "message": "Berkas berhasil diupload",
-  "metadata": {
-    "statusCode": 201
-  }
-}</code></pre>
-            </article>
-
-            <!-- Endpoint: Edit Berkas -->
-            <article id="berkas-edit" class="endpoint-card">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <span class="method-badge method-patch">PATCH</span>
-                    <h3 class="text-xl font-bold font-mono text-slate-800">/berkas/edit</h3>
-                    <div class="ml-auto flex gap-2">
-                        <span class="auth-badge required">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            Auth Required
-                        </span>
-                    </div>
-                </div>
-                
-                <p class="text-slate-600 mb-6">Memperbarui data diri siswa atau mengupload ulang berkas yang salah/ditolak oleh admin.</p>
-                
-                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r-md">
-                    <h4 class="text-amber-800 font-bold mb-1 text-sm">Persyaratan Khusus Endpoint Edit</h4>
-                    <p class="text-amber-700 text-sm">API akan menolak perubahan (Error 400 Bad Request) apabila <strong>TIDAK ADA SATU PUN</strong> dokumen milik siswa yang berstatus <code>REVISI</code>.</p>
-                </div>
-
-                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Request Form Data <span class="text-slate-400 font-normal lowercase">(multipart/form-data)</span></h4>
-                <p class="text-sm text-slate-500 mb-4">Parameter sama dengan endpoint <code>/berkas/upload</code>. Semua field bersifat <em>opsional</em> (partial update). Anda cukup mengirimkan data atau file yang ingin diubah saja.</p>
-
-                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
-                    <span>Response</span>
-                    <span class="text-blue-600">200 OK</span>
-                </h4>
-<pre><code>{
-  "status": true,
-  "message": "Berkas berhasil diupdate",
-  "metadata": {
-    "statusCode": 200
-  }
-}</code></pre>
-            </article>
-
-            <!-- Endpoint: All Berkas -->
-            <article id="berkas-all" class="endpoint-card">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <span class="method-badge method-get">GET</span>
-                    <h3 class="text-xl font-bold font-mono text-slate-800">/berkas/all-berkas</h3>
-                    <div class="ml-auto flex gap-2">
-                        <span class="auth-badge admin">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                            Admin Only
-                        </span>
-                    </div>
-                </div>
-                
-                <p class="text-slate-600 mb-6">Mengambil rekap seluruh data siswa pendaftar beserta detail dan status masing-masing berkasnya.</p>
-
-                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
-                    <span>Response</span>
-                    <span class="text-blue-600">200 OK</span>
-                </h4>
-<pre><code>{
-  "status": true,
-  "message": "Data berhasil ditemukan",
-  "metadata": {
-    "statusCode": 200,
-    "length": 1
-  },
-  "data": [
+            <div class="md:col-span-5">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"status"</span>: <span class="token-boolean">true</span>,
+  <span class="token-key">"data"</span>: [
     {
-      "id": 1,
-      "no_daftar": "SPMB-123456",
-      "nama": "Nama Siswa",
-      "email": "siswa@example.com",
-      "no_hp": "08123456789",
-      "nisn": "1234567890",
-      "asal_sekolah": "SMP 1",
-      "alamat": "Jl. Mawar",
-      "jurusan": "RPL",
-      "created_at": "2026-05-03T10:00:00Z",
-      "berkas": {
-        "surat_keterangan_lulus": {
-          "id": 1,
-          "path": "/uploads/1/uuid-skls.pdf",
-          "status": "PENDING",
-          "keterangan": null,
-          "updated_at": "2026-05-03T10:00:00Z"
-        },
-        "raport": {
-          "id": 2,
-          "path": "/uploads/1/uuid-raport.pdf",
-          "status": "DITERIMA",
-          "keterangan": null,
-          "updated_at": "2026-05-03T11:00:00Z"
+      <span class="token-key">"idUser"</span>: <span class="token-number">2</span>,
+      <span class="token-key">"nama"</span>: <span class="token-string">"Ahmad Wijaya"</span>,
+      <span class="token-key">"jurusan"</span>: <span class="token-string">"RPL"</span>
+    }
+  ]
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. PATCH Validasi Single Dokumen -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="validations-single" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 font-mono text-xs font-bold border border-orange-500/30">PATCH</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/validations/documents/:id</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <p class="text-sm text-slate-300">Memvalidasi satu jenis dokumen fisik pendaftar (misal: pas foto, rapor, akta) berdasarkan ID dokumen.</p>
+              
+              <div class="border border-white/5 rounded-xl overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="bg-slate-950/60 border-b border-white/5 text-slate-400">
+                      <th class="p-3">Body Field</th>
+                      <th class="p-3">Type</th>
+                      <th class="p-3">Validasi</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr>
+                      <td class="p-3 font-mono text-blue-400">status</td>
+                      <td class="p-3 text-slate-300">Enum</td>
+                      <td class="p-3 text-slate-400">VERIFIED, REVISI, REJECTED</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-mono text-blue-400">keterangan</td>
+                      <td class="p-3 text-slate-300">string</td>
+                      <td class="p-3 text-slate-400">Wajib jika status REVISI/REJECTED.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="md:col-span-5">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"status"</span>: <span class="token-string">"REVISI"</span>,
+  <span class="token-key">"keterangan"</span>: <span class="token-string">"Dokumen pas foto blur, mohon upload ulang"</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. PATCH Bulk Validasi Dokumen -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="validations-bulk" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 font-mono text-xs font-bold border border-orange-500/30">PATCH</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/validations/students/:studentId/documents</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <p class="text-sm text-slate-300">Memvalidasi banyak berkas sekaligus milik calon siswa tertentu (bulk verification) dalam satu request.</p>
+            </div>
+            <div class="md:col-span-5">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"documents"</span>: [
+    {
+      <span class="token-key">"document_id"</span>: <span class="token-string">"doc-uuid-a"</span>,
+      <span class="token-key">"status"</span>: <span class="token-string">"VERIFIED"</span>,
+      <span class="token-key">"keterangan"</span>: <span class="token-boolean">null</span>
+    },
+    {
+      <span class="token-key">"document_id"</span>: <span class="token-string">"doc-uuid-b"</span>,
+      <span class="token-key">"status"</span>: <span class="token-string">"REVISI"</span>,
+      <span class="token-key">"keterangan"</span>: <span class="token-string">"KTP Buram"</span>
+    }
+  ]
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. POST Input Nilai Rapor -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="rapor-create" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/rapor-scores</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <p class="text-sm text-slate-300">Menyimpan data nilai rapor semester 1-5 dan poin prestasi. Sistem otomatis mengalkulasi nilai rata-rata dan bobot akreditasi sekolah asal.</p>
+              
+              <div class="border border-white/5 rounded-xl overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="bg-slate-950/60 border-b border-white/5 text-slate-400">
+                      <th class="p-3">Field</th>
+                      <th class="p-3">Type</th>
+                      <th class="p-3">Validasi</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr>
+                      <td class="p-3 font-mono text-blue-400">id_student</td>
+                      <td class="p-3 text-slate-300">integer</td>
+                      <td class="p-3 text-slate-400 font-mono text-[10px]">IsInt()</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-mono text-blue-400">semester_1 s/d 5</td>
+                      <td class="p-3 text-slate-300">float</td>
+                      <td class="p-3 text-slate-400 font-mono text-[10px]">Min(0), Max(100)</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-mono text-blue-400">prestasi</td>
+                      <td class="p-3 text-slate-300">integer</td>
+                      <td class="p-3 text-slate-400 font-mono text-[10px]">Min(0), Max(10)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="md:col-span-5">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"id_student"</span>: <span class="token-number">5</span>,
+  <span class="token-key">"semester_1"</span>: <span class="token-number">88.5</span>,
+  <span class="token-key">"semester_2"</span>: <span class="token-number">90.0</span>,
+  <span class="token-key">"semester_3"</span>: <span class="token-number">85.0</span>,
+  <span class="token-key">"semester_4"</span>: <span class="token-number">87.5</span>,
+  <span class="token-key">"semester_5"</span>: <span class="token-number">91.2</span>,
+  <span class="token-key">"prestasi"</span>: <span class="token-number">2</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. GET List Rapor Kelulusan -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="rapor-findall" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">GET</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/rapor-scores</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Menampilkan peringkat skor akhir rapor seluruh pendaftar secara menurun (descending) untuk proses seleksi kelulusan.</p>
+          </div>
+        </div>
+
+        <!-- 8. GET Detail Rapor Siswa -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="rapor-findone" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">GET</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/rapor-scores/:id</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Mengambil detail nilai rapor beserta bobot akhir milik satu siswa berdasarkan ID rapor.</p>
+          </div>
+        </div>
+
+        <!-- 9. PATCH Update Nilai Rapor -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="rapor-update" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 font-mono text-xs font-bold border border-orange-500/30">PATCH</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/rapor-scores/:id</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Merubah sebagian nilai semester atau prestasi. Rata-rata dan skor akhir otomatis dihitung ulang.</p>
+          </div>
+        </div>
+
+        <!-- 10. DELETE Nilai Rapor -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="rapor-delete" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 font-mono text-xs font-bold border border-red-500/30">DELETE</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/rapor-scores/:id</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Menghapus data rapor pendaftar dari sistem database.</p>
+          </div>
+        </div>
+
+        <!-- 11. POST Buat Jadwal Ujian -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="cards-schedules-create" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/cards/test-schedules</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <p class="text-sm text-slate-300">Membuat sesi / jadwal ujian test akademik untuk calon siswa pendaftar.</p>
+              
+              <div class="border border-white/5 rounded-xl overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="bg-slate-950/60 border-b border-white/5 text-slate-400">
+                      <th class="p-3">Field</th>
+                      <th class="p-3">Type</th>
+                      <th class="p-3">Keterangan</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr>
+                      <td class="p-3 font-mono text-blue-400">tanggal_test</td>
+                      <td class="p-3 text-slate-300">string (Date)</td>
+                      <td class="p-3 text-slate-400 font-mono text-[10px]">IsDateString()</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-mono text-blue-400">jam_test</td>
+                      <td class="p-3 text-slate-300">string</td>
+                      <td class="p-3 text-slate-400">Contoh: "08:00 - 10:00"</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-mono text-blue-400">lokasi_test</td>
+                      <td class="p-3 text-slate-300">string</td>
+                      <td class="p-3 text-slate-400">Contoh: "Lab RPL"</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="md:col-span-5">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"tanggal_test"</span>: <span class="token-string">"2026-06-15T00:00:00.000Z"</span>,
+  <span class="token-key">"jam_test"</span>: <span class="token-string">"08:00 - 10:00"</span>,
+  <span class="token-key">"lokasi_test"</span>: <span class="token-string">"Lab Komputer Utama"</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12. GET List Semua Jadwal Ujian -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="cards-schedules-findall" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">GET</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/cards/test-schedules</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Menampilkan seluruh daftar slot jadwal ujian yang tersedia.</p>
+          </div>
+        </div>
+
+        <!-- 13. PATCH Edit Jadwal Ujian -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="cards-schedules-update" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 font-mono text-xs font-bold border border-orange-500/30">PATCH</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/cards/test-schedules/:id</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Memperbarui info tanggal, jam, atau tempat dari suatu sesi ujian berdasarkan ID.</p>
+          </div>
+        </div>
+
+        <!-- 14. DELETE Hapus Jadwal Ujian -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="cards-schedules-delete" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 font-mono text-xs font-bold border border-red-500/30">DELETE</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/cards/test-schedules/:id</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <p class="text-sm text-slate-300">Menghapus sesi jadwal ujian pendaftaran tertentu.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="pt-8 border-t border-white/5 text-center text-xs text-slate-500">
+        <p>&copy; 2026 PPDB SMK API Engine. All rights reserved. Enterprise SaaS platform.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Clipboard Copy Helper
+    function copyToClipboard(elementId) {
+      const codeElement = document.getElementById(elementId);
+      const textToCopy = codeElement.innerText || codeElement.textContent;
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const btn = codeElement.parentElement.querySelector('button');
+        if (btn) {
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>';
+          lucide.createIcons();
+          setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            lucide.createIcons();
+          }, 1500);
         }
+      }).catch(err => {
+        console.error('Gagal menyalin text: ', err);
+      });
+    }
+
+    // Role Filtering
+    let currentRole = 'all';
+    function setRoleFilter(role) {
+      currentRole = role;
+      
+      // Update UI Tabs
+      const tabs = {
+        all: document.getElementById('tab-all'),
+        user: document.getElementById('tab-user'),
+        admin: document.getElementById('tab-admin')
+      };
+
+      Object.keys(tabs).forEach(k => {
+        if (k === role) {
+          tabs[k].className = 'flex-1 py-1.5 rounded-lg text-center font-medium transition-all bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md';
+        } else {
+          tabs[k].className = 'flex-1 py-1.5 rounded-lg text-center font-medium transition-all text-slate-400 hover:text-slate-200';
+        }
+      });
+
+      // Filter Sidebar Section
+      const userSections = document.querySelectorAll('.role-section');
+      const userSection = document.getElementById('section-user-endpoints');
+      const adminSection = document.getElementById('section-admin-endpoints');
+
+      if (role === 'all') {
+        userSection.style.display = 'block';
+        adminSection.style.display = 'block';
+      } else if (role === 'user') {
+        userSection.style.display = 'block';
+        adminSection.style.display = 'none';
+      } else if (role === 'admin') {
+        userSection.style.display = 'none';
+        adminSection.style.display = 'block';
+      }
+
+      // Filter Main Content Cards & Sections
+      const contentUserSec = document.getElementById('content-user-section');
+      const contentAdminSec = document.getElementById('content-admin-section');
+      const endpointCards = document.querySelectorAll('.endpoint-card');
+
+      if (role === 'all') {
+        contentUserSec.style.display = 'block';
+        contentAdminSec.style.display = 'block';
+        endpointCards.forEach(c => c.style.display = 'block');
+      } else if (role === 'user') {
+        contentUserSec.style.display = 'block';
+        contentAdminSec.style.display = 'none';
+        endpointCards.forEach(c => {
+          if (c.getAttribute('data-role') === 'user') c.style.display = 'block';
+          else c.style.display = 'none';
+        });
+      } else if (role === 'admin') {
+        contentUserSec.style.display = 'none';
+        contentAdminSec.style.display = 'block';
+        endpointCards.forEach(c => {
+          if (c.getAttribute('data-role') === 'admin') c.style.display = 'block';
+          else c.style.display = 'none';
+        });
+      }
+
+      // Update counters dynamically
+      const statEndpoints = document.getElementById('stat-endpoints');
+      const statSecured = document.getElementById('stat-secured');
+      
+      if (role === 'all') {
+        statEndpoints.innerText = '22 API';
+        statSecured.innerText = '18 Route';
+      } else if (role === 'user') {
+        statEndpoints.innerText = '8 API';
+        statSecured.innerText = '6 Route';
+      } else if (role === 'admin') {
+        statEndpoints.innerText = '14 API';
+        statSecured.innerText = '12 Route';
       }
     }
-  ]
-}</code></pre>
-            </article>
 
-            <!-- ============================================== -->
-            <!-- USERS ENDPOINTS -->
-            <!-- ============================================== -->
-            <div class="flex items-center gap-4 mb-8 mt-12">
-                <h2 class="text-3xl font-bold text-slate-900">Users</h2>
-                <div class="h-px bg-slate-200 flex-1"></div>
-            </div>
+    // Live search functional filter for endpoints
+    const searchInput = document.getElementById('endpoint-search');
+    
+    searchInput.addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase().trim();
+      const sidebarItems = document.querySelectorAll('.sidebar-item');
+      const moduleGroups = document.querySelectorAll('.module-group');
 
-            <!-- Endpoint: Users All / Filter -->
-            <article id="users-all" class="endpoint-card">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <span class="method-badge method-get">GET</span>
-                    <h3 class="text-xl font-bold font-mono text-slate-800">/users</h3>
-                    <div class="ml-auto flex gap-2">
-                        <span class="auth-badge public">
-                            Public
-                        </span>
-                    </div>
-                </div>
-                
-                <p class="text-slate-600 mb-6">Melihat data diri ringkas daftar siswa yang sudah terdaftar. Dapat difilter berdasarkan jurusan yang dipilih.</p>
+      sidebarItems.forEach(item => {
+        const searchTerm = item.getAttribute('data-search-term').toLowerCase();
+        if (searchTerm.includes(query)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
 
-                <h4 class="font-semibold text-slate-900 mb-2 text-sm uppercase tracking-wider">Query Parameters <span class="text-slate-400 font-normal lowercase">(Optional)</span></h4>
-                <table class="table-custom">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Keterangan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="font-mono text-slate-700">jurusan</td>
-                            <td class="text-slate-500">String</td>
-                            <td>Filter berdasarkan jurusan. Contoh: <code>/users?jurusan=RPL</code></td>
-                        </tr>
-                    </tbody>
-                </table>
+      // Hide group header if empty
+      moduleGroups.forEach(group => {
+        const visibleItems = group.querySelectorAll('.sidebar-item[style="display: block;"], .sidebar-item:not([style*="display: none"])');
+        if (visibleItems.length === 0) {
+          group.style.display = 'none';
+        } else {
+          group.style.display = 'block';
+        }
+      });
+    });
 
-                <h4 class="font-semibold text-slate-900 mt-6 mb-2 text-sm uppercase tracking-wider flex justify-between">
-                    <span>Response</span>
-                    <span class="text-blue-600">200 OK</span>
-                </h4>
-<pre><code>{
-  "status": true,
-  "message": "Berhasil mengambil data siswa jurusan RPL",
-  "metadata": {
-    "statusCode": 200,
-    "length": 1
-  },
-  "data": [
-    {
-      "idUser": 1,
-      "no_daftar": "SPMB-123456",
-      "email": "siswa@example.com",
-      "nama": "Nama Siswa",
-      "jurusan": "RPL",
-      "no_hp": "08123456789",
-      "nisn": "1234567890",
-      "asal_sekolah": "SMP 1",
-      "alamat": "Jl. Mawar"
+    // Scrollspy for sidebar active highlight
+    const mainContentElements = document.querySelectorAll('.endpoint-card, #introduction, #authentication');
+    const sidebarNavLinks = document.querySelectorAll('#sidebar-nav a');
+
+    function highlightNav() {
+      let currentSectionId = '';
+      const scrollPosition = window.scrollY + 120;
+
+      mainContentElements.forEach(section => {
+        const top = section.offsetTop;
+        const height = section.offsetHeight;
+        if (scrollPosition >= top && scrollPosition < top + height) {
+          currentSectionId = section.getAttribute('id');
+        }
+      });
+
+      sidebarNavLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === `#${currentSectionId}`) {
+          link.classList.add('nav-active');
+        } else {
+          link.classList.remove('nav-active');
+        }
+      });
     }
-  ]
-}</code></pre>
-            </article>
 
-            <!-- Footer -->
-            <footer class="mt-20 pt-8 border-t border-slate-200 text-center text-slate-500 text-sm pb-12">
-                <p>&copy; 2026 PPDB SMK. Generated API Documentation.</p>
-            </footer>
-
-        </div>
-    </main>
-
-    <!-- Script to handle active sidebar states -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sections = document.querySelectorAll('section, article');
-            const navLinks = document.querySelectorAll('.sidebar-link');
-
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.3
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const id = entry.target.getAttribute('id');
-                        navLinks.forEach(link => {
-                            link.classList.remove('active');
-                            if (link.getAttribute('href') === `#${id}`) {
-                                link.classList.add('active');
-                            }
-                        });
-                    }
-                });
-            }, observerOptions);
-
-            sections.forEach(section => {
-                observer.observe(section);
-            });
-        });
-    </script>
+    window.addEventListener('scroll', highlightNav);
+    window.addEventListener('load', highlightNav);
+  </script>
 </body>
 </html>

@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException, NotFoundException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  HttpStatus,
+} from '@nestjs/common';
 import { PrismaService } from '../lib/prisma.service.js';
 import { StatusDocument } from '../../generated/prisma/client';
 
@@ -44,6 +49,7 @@ export class UsersService {
           asal_sekolah: user.students?.asal_sekolah || null,
           akreditasi_sekolah: user.students?.akreditasi_sekolah || null,
           alamat: user.students?.alamat || null,
+          status_berkas: user.students?.verification_status || null,
         })),
       };
     } catch (error) {
@@ -66,7 +72,9 @@ export class UsersService {
       });
 
       if (!student) {
-        throw new NotFoundException('Data pendaftaran tidak ditemukan. Siswa belum mensubmit berkas.');
+        throw new NotFoundException(
+          'Data pendaftaran tidak ditemukan. Siswa belum mensubmit berkas.',
+        );
       }
 
       // Filter dokumen yang berstatus REVISI atau REJECTED saja

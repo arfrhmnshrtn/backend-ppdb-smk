@@ -12,11 +12,13 @@ async function bootstrap() {
   app.enableCors();
 
   // Aktifkan validasi DTO secara global
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, // mencegah mass assignment
-    forbidNonWhitelisted: true, // tolak properti yang tidak ada di DTO
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // mencegah mass assignment
+      forbidNonWhitelisted: true, // tolak properti yang tidak ada di DTO
+      transform: true,
+    }),
+  );
 
   // Aktifkan exception filter untuk response yang konsisten
   app.useGlobalFilters(new AllExceptionsFilter());
