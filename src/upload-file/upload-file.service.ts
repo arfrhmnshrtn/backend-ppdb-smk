@@ -31,7 +31,7 @@ export type UploadFileFields = {
 export class UploadFileService {
   private readonly prisma = PrismaService;
 
-  constructor(private validationsService: ValidationsService) {}
+  constructor(private validationsService: ValidationsService) { }
 
   private async processDocument(
     studentId: number,
@@ -326,6 +326,87 @@ export class UploadFileService {
       }
       throw new InternalServerErrorException(
         'Terjadi kesalahan saat findall berkas',
+      );
+    }
+  }
+
+  async findBerkasByStudentId(userId: number, studentId: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      const studentData = await this.prisma.students.findUnique({
+        where: { id: studentId },
+        include: {
+          user: { select: { email: true } },
+          documents: {
+            include: {
+              document_type: true,
+            },
+          },
+        },
+      });
+
+      if (!studentData) {
+        throw new NotFoundException('Data siswa tidak ditemukan');
+      }
+
+      if (user?.role !== 'ADMIN' && studentData.id_user !== userId) {
+        throw new ForbiddenException(
+          'Anda tidak memiliki akses untuk melihat berkas siswa ini.',
+        );
+      }
+
+      const files: Record<string, any> = {};
+      studentData.documents.forEach((doc) => {
+        // Map /uploads/ path to relative URL /files/ for public access
+        const publicPath = doc.file_path
+          ? doc.file_path.replace(/^\/uploads/, '/files')
+          : null;
+
+        files[doc.document_type.name] = {
+          id: doc.id,
+          path: publicPath,
+          status: doc.status,
+          keterangan: doc.keterangan,
+          updated_at: doc.updated_at,
+        };
+      });
+
+      return {
+        status: true,
+        message: 'Data berkas berhasil ditemukan',
+        metadata: {
+          statusCode: HttpStatus.OK,
+        },
+        data: {
+          id: studentData.id,
+          no_daftar: studentData.no_daftar,
+          nama: studentData.nama,
+          email: studentData.user.email,
+          no_hp: studentData.no_hp,
+          nisn: studentData.nisn,
+          asal_sekolah: studentData.asal_sekolah,
+          akreditasi_sekolah: studentData.akreditasi_sekolah,
+          alamat: studentData.alamat,
+          jurusan: studentData.jurusan,
+          created_at: studentData.created_at,
+          berkas: files,
+        },
+      };
+    } catch (error) {
+      if (
+        error instanceof ForbiddenException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+      }
+      throw new InternalServerErrorException(
+        'Terjadi kesalahan saat mencari berkas',
       );
     }
   }
