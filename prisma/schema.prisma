@@ -8,23 +8,25 @@ datasource db {
 }
 
 model students {
-  id                  Int                @id @default(autoincrement())
-  id_user             Int                @unique
-  no_daftar           String
-  nama                String
-  no_hp               String
-  nisn                String
-  asal_sekolah        String
-  akreditasi_sekolah  String
-  alamat              String
-  foto                String?
-  jurusan             Jurusan
-  created_at          DateTime           @default(now())
-  verification_status VerificationStatus @default(BELUM_SUBMIT)
-  documents           documents[]
-  user                user               @relation(fields: [id_user], references: [id])
-  raporScores         RaporScore[]
-  nilaiScore          nilai_scores?
+  id                   Int                    @id @default(autoincrement())
+  id_user              Int                    @unique
+  no_daftar            String
+  nama                 String
+  no_hp                String
+  nisn                 String
+  asal_sekolah         String
+  akreditasi_sekolah   String
+  alamat               String
+  foto                 String?
+  jurusan              Jurusan
+  created_at           DateTime               @default(now())
+  verification_status  VerificationStatus     @default(BELUM_SUBMIT)
+  documents            documents[]
+  user                 user                   @relation(fields: [id_user], references: [id])
+  raporScores          RaporScore[]
+  nilaiScore           nilai_scores?
+  studentAnnouncements student_announcements?
+  studentRanking       student_ranking?
 }
 
 model document_types {
@@ -108,7 +110,7 @@ model RaporScore {
 
   prestasi Int @default(0)
 
-  rata_rata Float @default(0)
+  rata_rata   Float @default(0)
   nilai_akhir Float @default(0)
 
   created_at DateTime @default(now())
@@ -121,18 +123,53 @@ model RaporScore {
 }
 
 model nilai_scores {
-  id               String   @id @default(cuid())
-  student_id       Int      @unique
+  id         String @id @default(cuid())
+  student_id Int    @unique
 
-  math_score       Int
-  indonesia_score  Int
-  english_score    Int
-  religion_score   Int
+  math_score      Int
+  indonesia_score Int
+  english_score   Int
+  religion_score  Int
 
-  average_score    Float
+  average_score Float
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   student students @relation(fields: [student_id], references: [id], onDelete: Cascade)
+}
+
+model student_ranking {
+  id          String   @id @default(cuid())
+  id_student  Int      @unique
+  final_score Float
+  ranking     Int
+  jurusan     Jurusan
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  student     students @relation(fields: [id_student], references: [id], onDelete: Cascade)
+
+  @@map("student_ranking")
+}
+
+model student_announcements {
+  id         String @id @default(cuid())
+  id_student Int    @unique
+
+  status StudentAnnouncementStatus @default(PENDING)
+
+  published_at DateTime?
+  is_published Boolean   @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  student students @relation(fields: [id_student], references: [id], onDelete: Cascade)
+}
+
+enum StudentAnnouncementStatus {
+  PENDING
+  PASSED
+  FAILED
+  RESERVE
 }
