@@ -52,13 +52,14 @@ model documents {
 }
 
 model user {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique(map: "User_email_key")
-  name      String?
-  password  String
-  createdAt DateTime  @default(now())
-  role      user_role @default(USER)
-  students  students?
+  id           Int       @id @default(autoincrement())
+  email        String    @unique(map: "User_email_key")
+  name         String?
+  password     String
+  createdAt    DateTime  @default(now())
+  role         user_role @default(USER)
+  students     students?
+  refreshToken String?   @db.Text
 }
 
 model test_schedules {
