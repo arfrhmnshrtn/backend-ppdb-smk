@@ -7,9 +7,10 @@ import { UsersModule } from './users/users.module';
 import { ValidationsModule } from './validations/validations.module';
 import { RaporScoresModule } from './rapor-scores/rapor-scores.module';
 import { CardsModule } from './cards/cards.module';
+import { NilaiScoresModule } from './nilai-scores/nilai-scores.module';
 
 @Module({
-  imports: [AuthModule, UploadFileModule, UsersModule, ValidationsModule, RaporScoresModule, CardsModule],
+  imports: [AuthModule, UploadFileModule, UsersModule, ValidationsModule, RaporScoresModule, CardsModule, NilaiScoresModule],
   controllers: [AppController],
   providers: [AppService],
 })

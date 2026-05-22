@@ -24,6 +24,7 @@ model students {
   documents           documents[]
   user                user               @relation(fields: [id_user], references: [id])
   raporScores         RaporScore[]
+  nilaiScore          nilai_scores?
 }
 
 model document_types {
@@ -119,3 +120,19 @@ model RaporScore {
   @@index([id_student], map: "rapor_scores_id_student_fkey")
 }
 
+model nilai_scores {
+  id               String   @id @default(cuid())
+  student_id       Int      @unique
+
+  math_score       Int
+  indonesia_score  Int
+  english_score    Int
+  religion_score   Int
+
+  average_score    Float
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  student students @relation(fields: [student_id], references: [id], onDelete: Cascade)
+}
