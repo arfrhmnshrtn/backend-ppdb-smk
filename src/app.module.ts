@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
@@ -8,6 +9,8 @@ import { ValidationsModule } from './validations/validations.module';
 import { RaporScoresModule } from './rapor-scores/rapor-scores.module';
 import { CardsModule } from './cards/cards.module';
 import { NilaiScoresModule } from './nilai-scores/nilai-scores.module';
+import { RankingsModule } from './rankings/rankings.module.js';
+import { AnnouncementsModule } from './announcements/announcements.module';
 
 @Module({
   imports: [
@@ -18,8 +21,10 @@ import { NilaiScoresModule } from './nilai-scores/nilai-scores.module';
     RaporScoresModule,
     CardsModule,
     NilaiScoresModule,
+    RankingsModule,
+    AnnouncementsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
