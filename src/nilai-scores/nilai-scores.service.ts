@@ -26,7 +26,9 @@ export class NilaiScoresService {
     });
 
     if (!student) {
-      throw new NotFoundException(`Student dengan ID ${student_id} tidak ditemukan`);
+      throw new NotFoundException(
+        `Student dengan ID ${student_id} tidak ditemukan`,
+      );
     }
 
     // Check if score already exists
@@ -95,7 +97,7 @@ export class NilaiScoresService {
     return {
       data,
       meta: {
-        total
+        total,
       },
     };
   }

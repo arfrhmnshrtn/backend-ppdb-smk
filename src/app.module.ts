@@ -10,7 +10,15 @@ import { CardsModule } from './cards/cards.module';
 import { NilaiScoresModule } from './nilai-scores/nilai-scores.module';
 
 @Module({
-  imports: [AuthModule, UploadFileModule, UsersModule, ValidationsModule, RaporScoresModule, CardsModule, NilaiScoresModule],
+  imports: [
+    AuthModule,
+    UploadFileModule,
+    UsersModule,
+    ValidationsModule,
+    RaporScoresModule,
+    CardsModule,
+    NilaiScoresModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

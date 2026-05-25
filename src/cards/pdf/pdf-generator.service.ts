@@ -54,7 +54,9 @@ export class PdfGeneratorService {
       return Buffer.from(pdfBuffer);
     } catch (error) {
       console.error('Gagal generate PDF:', error);
-      throw new InternalServerErrorException('Gagal membuat file PDF kartu pendaftaran');
+      throw new InternalServerErrorException(
+        'Gagal membuat file PDF kartu pendaftaran',
+      );
     } finally {
       if (browser) {
         await browser.close();

@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../lib/prisma.service';
 import { CreateRaporScoreDto } from './dto/create-rapor-score.dto';
 import { UpdateRaporScoreDto } from './dto/update-rapor-score.dto';
+import { QueryRaporStatusDto, RaporStatus } from './dto/query-rapor-status.dto';
 import { Prisma } from '../../generated/prisma/client';
 
 /**
@@ -187,7 +188,9 @@ export class RaporScoresService {
       });
 
       if (!raporScore) {
-        throw new NotFoundException(`Data rapor dengan ID ${id} tidak ditemukan`);
+        throw new NotFoundException(
+          `Data rapor dengan ID ${id} tidak ditemukan`,
+        );
       }
 
       return {
@@ -218,7 +221,9 @@ export class RaporScoresService {
       });
 
       if (!existingRapor) {
-        throw new NotFoundException(`Data rapor dengan ID ${id} tidak ditemukan`);
+        throw new NotFoundException(
+          `Data rapor dengan ID ${id} tidak ditemukan`,
+        );
       }
 
       // 2. Merge data lama dengan data baru (PartialType)
@@ -280,7 +285,9 @@ export class RaporScoresService {
       });
 
       if (!existingRapor) {
-        throw new NotFoundException(`Data rapor dengan ID ${id} tidak ditemukan`);
+        throw new NotFoundException(
+          `Data rapor dengan ID ${id} tidak ditemukan`,
+        );
       }
 
       await this.prisma.raporScore.delete({
@@ -293,6 +300,69 @@ export class RaporScoresService {
       };
     } catch (error) {
       this.handleException(error, 'Gagal menghapus data rapor');
+    }
+  }
+
+  /**
+   * Mengambil data siswa berdasarkan status input nilai rapor.
+   * Mendukung pencarian, filter jurusan, dan pagination.
+   */
+  async findStudentsByStatus(query: QueryRaporStatusDto) {
+    try {
+      const { status, page = 1, limit = 10, search, jurusan } = query;
+      const skip = (page - 1) * limit;
+
+      const whereClause: Prisma.studentsWhereInput = {};
+
+      if (status === RaporStatus.SUDAH) {
+        whereClause.raporScores = {
+          some: {},
+        };
+      } else if (status === RaporStatus.BELUM) {
+        whereClause.raporScores = {
+          none: {},
+        };
+      }
+
+      if (search) {
+        whereClause.OR = [
+          { nama: { contains: search } },
+          { nisn: { contains: search } },
+        ];
+      }
+
+      if (jurusan) {
+        whereClause.jurusan = jurusan;
+      }
+
+      const [total, data] = await Promise.all([
+        this.prisma.students.count({ where: whereClause }),
+        this.prisma.students.findMany({
+          where: whereClause,
+          skip,
+          take: limit,
+          include: {
+            raporScores: true,
+          },
+          orderBy: {
+            nama: 'asc',
+          },
+        }),
+      ]);
+
+      return {
+        success: true,
+        message: `Berhasil mengambil data siswa dengan status rapor ${status}`,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+        data,
+      };
+    } catch (error) {
+      this.handleException(error, 'Gagal mengambil data status rapor siswa');
     }
   }
 

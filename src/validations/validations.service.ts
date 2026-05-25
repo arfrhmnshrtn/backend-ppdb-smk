@@ -8,7 +8,10 @@ import {
 import { ValidateDocumentDto } from './dto/validate-document.dto';
 import { BulkValidateDocumentsDto } from './dto/bulk-validate-documents.dto';
 import { PrismaService } from '../lib/prisma.service';
-import { StatusDocument, VerificationStatus } from '../../generated/prisma/client';
+import {
+  StatusDocument,
+  VerificationStatus,
+} from '../../generated/prisma/client';
 
 @Injectable()
 export class ValidationsService {
@@ -74,7 +77,10 @@ export class ValidationsService {
   /**
    * Method untuk admin melakukan validasi bulk pada banyak dokumen milik satu siswa
    */
-  async bulkValidateDocuments(studentId: number, bulkValidateDto: BulkValidateDocumentsDto) {
+  async bulkValidateDocuments(
+    studentId: number,
+    bulkValidateDto: BulkValidateDocumentsDto,
+  ) {
     try {
       const { documents } = bulkValidateDto;
 
@@ -85,15 +91,19 @@ export class ValidationsService {
       });
 
       if (!studentDocuments || studentDocuments.length === 0) {
-        throw new NotFoundException('Siswa tidak ditemukan atau belum memiliki dokumen');
+        throw new NotFoundException(
+          'Siswa tidak ditemukan atau belum memiliki dokumen',
+        );
       }
 
       // 2. Validasi Ownership & Keberadaan Dokumen (IDOR prevention)
       // Pastikan semua document_id yang dikirim benar-benar milik studentId ini
-      const validDocumentIds = new Set(studentDocuments.map(doc => doc.id));
+      const validDocumentIds = new Set(studentDocuments.map((doc) => doc.id));
       for (const doc of documents) {
         if (!validDocumentIds.has(doc.document_id)) {
-          throw new BadRequestException(`Dokumen dengan ID ${doc.document_id} tidak valid atau bukan milik siswa ini (Potensi IDOR)`);
+          throw new BadRequestException(
+            `Dokumen dengan ID ${doc.document_id} tidak valid atau bukan milik siswa ini (Potensi IDOR)`,
+          );
         }
       }
 
@@ -101,7 +111,7 @@ export class ValidationsService {
       // Menggunakan array operasi untuk prisma.$transaction
       const transactionOperations = documents.map((doc) => {
         let finalKeterangan: string | null | undefined = doc.keterangan;
-        
+
         // Aturan bisnis: Jika APPROVED, keterangan otomatis null
         if (doc.status === StatusDocument.APPROVED) {
           finalKeterangan = null;
@@ -135,7 +145,6 @@ export class ValidationsService {
     }
   }
 
-
   /**
    * Helper method untuk update status verifikasi siswa secara otomatis.
    * Backend adalah source of truth untuk field verification_status.
@@ -151,11 +160,20 @@ export class ValidationsService {
 
     let newStatus: VerificationStatus = VerificationStatus.BELUM_SUBMIT;
 
-    if (studentDocuments.length > 0 && studentDocuments.length >= totalDocumentTypes) {
+    if (
+      studentDocuments.length > 0 &&
+      studentDocuments.length >= totalDocumentTypes
+    ) {
       // Siswa sudah submit semua dokumen (atau lebih), jalankan pengecekan prioritas status
-      const hasRejected = studentDocuments.some(doc => doc.status === StatusDocument.REJECTED);
-      const hasRevisi = studentDocuments.some(doc => doc.status === StatusDocument.REVISI);
-      const allApproved = studentDocuments.every(doc => doc.status === StatusDocument.APPROVED);
+      const hasRejected = studentDocuments.some(
+        (doc) => doc.status === StatusDocument.REJECTED,
+      );
+      const hasRevisi = studentDocuments.some(
+        (doc) => doc.status === StatusDocument.REVISI,
+      );
+      const allApproved = studentDocuments.every(
+        (doc) => doc.status === StatusDocument.APPROVED,
+      );
 
       if (hasRejected) {
         newStatus = VerificationStatus.DITOLAK;
@@ -178,8 +196,6 @@ export class ValidationsService {
     });
   }
 
-
-
   /**
    * Reusable helper untuk menangani exception agar pesan error lebih rapi
    */
@@ -191,10 +207,10 @@ export class ValidationsService {
     ) {
       throw error; // Rethrow NestJS exceptions
     }
-    
+
     // Log error internal untuk debugging
     console.error(defaultMessage, error);
-    
+
     throw new InternalServerErrorException({
       success: false,
       message: defaultMessage,

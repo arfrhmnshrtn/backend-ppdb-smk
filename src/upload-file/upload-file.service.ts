@@ -31,7 +31,7 @@ export type UploadFileFields = {
 export class UploadFileService {
   private readonly prisma = PrismaService;
 
-  constructor(private validationsService: ValidationsService) { }
+  constructor(private validationsService: ValidationsService) {}
 
   private async processDocument(
     studentId: number,
@@ -63,7 +63,7 @@ export class UploadFileService {
         data: {
           file_path: filePath,
           status: 'PENDING', // Kembali ke PENDING setelah direvisi
-          keterangan: null,  // Hapus keterangan karena dokumen sudah direvisi
+          keterangan: null, // Hapus keterangan karena dokumen sudah direvisi
         },
       });
     } else {
@@ -128,9 +128,18 @@ export class UploadFileService {
 
       // 2. Simpan semua file sebagai documents
       const documentFields = [
-        'surat_keterangan_lulus', 'raport', 'ktp_ayah', 'ktp_ibu',
-        'kartu_keluarga', 'akta_kelahiran', 'pas_foto', 'sptjm',
-        'kip', 'paiagam', 'sk_osis', 'sk_pramuka'
+        'surat_keterangan_lulus',
+        'raport',
+        'ktp_ayah',
+        'ktp_ibu',
+        'kartu_keluarga',
+        'akta_kelahiran',
+        'pas_foto',
+        'sptjm',
+        'kip',
+        'paiagam',
+        'sk_osis',
+        'sk_pramuka',
       ];
 
       for (const field of documentFields) {
@@ -139,7 +148,7 @@ export class UploadFileService {
             student.id,
             userId,
             field,
-            files[field as keyof UploadFileFields]
+            files[field as keyof UploadFileFields],
           );
         }
       }
@@ -187,7 +196,9 @@ export class UploadFileService {
       }
 
       // Validasi: Cek apakah ada dokumen yang berstatus REVISI
-      const hasRevisi = student.documents.some((doc) => doc.status === 'REVISI');
+      const hasRevisi = student.documents.some(
+        (doc) => doc.status === 'REVISI',
+      );
       if (!hasRevisi && student.documents.length > 0) {
         throw new BadRequestException(
           'Berkas tidak bisa diupdate. Hanya berkas dengan status REVISI yang dapat diubah.',
@@ -210,22 +221,31 @@ export class UploadFileService {
 
       // Update files
       const documentFields = [
-        'surat_keterangan_lulus', 'raport', 'ktp_ayah', 'ktp_ibu',
-        'kartu_keluarga', 'akta_kelahiran', 'pas_foto', 'sptjm',
-        'kip', 'paiagam', 'sk_osis', 'sk_pramuka'
+        'surat_keterangan_lulus',
+        'raport',
+        'ktp_ayah',
+        'ktp_ibu',
+        'kartu_keluarga',
+        'akta_kelahiran',
+        'pas_foto',
+        'sptjm',
+        'kip',
+        'paiagam',
+        'sk_osis',
+        'sk_pramuka',
       ];
 
       for (const field of documentFields) {
         if (files[field as keyof UploadFileFields]) {
           const existingDoc = student.documents.find(
-            (d) => d.document_type.name === field
+            (d) => d.document_type.name === field,
           );
           await this.processDocument(
             student.id,
             userId,
             field,
             files[field as keyof UploadFileFields],
-            existingDoc
+            existingDoc,
           );
         }
       }
@@ -283,9 +303,13 @@ export class UploadFileService {
       const formattedData = studentsData.map((student) => {
         const files: Record<string, any> = {};
         student.documents.forEach((doc) => {
+          const publicPath = doc.file_path
+            ? doc.file_path.replace(/^\/uploads/, '/files')
+            : null;
+
           files[doc.document_type.name] = {
             id: doc.id,
-            path: doc.file_path,
+            path: publicPath,
             status: doc.status,
             keterangan: doc.keterangan,
             updated_at: doc.updated_at,

@@ -28,7 +28,7 @@ if (!fs.existsSync(uploadPath)) {
 
 @Controller('berkas')
 export class UploadFileController {
-  constructor(private readonly uploadFileService: UploadFileService) { }
+  constructor(private readonly uploadFileService: UploadFileService) {}
 
   @Post('/upload')
   @UseGuards(AuthGuard)
@@ -198,6 +198,9 @@ export class UploadFileController {
     @Param('studentId') studentId: string,
   ) {
     const userId = req.user?.sub;
-    return this.uploadFileService.findBerkasByStudentId(userId, parseInt(studentId, 10));
+    return this.uploadFileService.findBerkasByStudentId(
+      userId,
+      parseInt(studentId, 10),
+    );
   }
 }

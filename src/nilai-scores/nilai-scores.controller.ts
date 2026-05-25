@@ -25,7 +25,7 @@ import { user_role } from '../../generated/prisma/client';
 @UseGuards(AuthGuard, RolesGuard)
 @Roles(user_role.ADMIN)
 export class NilaiScoresController {
-  constructor(private readonly nilaiScoresService: NilaiScoresService) { }
+  constructor(private readonly nilaiScoresService: NilaiScoresService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -47,7 +47,7 @@ export class NilaiScoresController {
       status: HttpStatus.OK,
       meta: result.meta,
       message: 'Data nilai berhasil diambil',
-      data: result.data
+      data: result.data,
     };
   }
 

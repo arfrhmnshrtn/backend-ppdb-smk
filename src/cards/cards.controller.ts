@@ -110,4 +110,3 @@ export class CardsController {
     return this.cardsService.removeTestSchedule(id);
   }
 }
-
