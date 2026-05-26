@@ -18,7 +18,9 @@ export class UsersController {
   @Get('registration-status')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(user_role.USER)
-  getRegistrationStatus(@Req() req: Request & { user: { sub: number; role: string } }) {
+  getRegistrationStatus(
+    @Req() req: Request & { user: { sub: number; role: string } },
+  ) {
     const userId = req.user.sub;
     return this.usersService.getRegistrationStatus(userId);
   }

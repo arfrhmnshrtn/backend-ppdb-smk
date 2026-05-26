@@ -8,10 +8,12 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { RaporScoresService } from './rapor-scores.service';
 import { CreateRaporScoreDto } from './dto/create-rapor-score.dto';
 import { UpdateRaporScoreDto } from './dto/update-rapor-score.dto';
+import { QueryRaporStatusDto } from './dto/query-rapor-status.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -43,6 +45,15 @@ export class RaporScoresController {
   @Get()
   findAll() {
     return this.raporScoresService.findAll();
+  }
+
+  /**
+   * GET /rapor-scores/students-status
+   * Mengambil data siswa berdasarkan status input nilai rapor.
+   */
+  @Get('students-status')
+  findStudentsByStatus(@Query() query: QueryRaporStatusDto) {
+    return this.raporScoresService.findStudentsByStatus(query);
   }
 
   /**

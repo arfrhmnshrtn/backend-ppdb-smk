@@ -29,14 +29,21 @@ export function generateCardHtml(data: CardTemplateData): string {
         const urlObj = new URL(data.foto);
         relativePath = urlObj.pathname.replace(/^\/files/, 'uploads');
       } else {
-        relativePath = data.foto.replace(/^\/files/, 'uploads').replace(/^\/uploads/, 'uploads');
+        relativePath = data.foto
+          .replace(/^\/files/, 'uploads')
+          .replace(/^\/uploads/, 'uploads');
       }
-      
+
       const fotoPath = path.join(process.cwd(), relativePath);
       if (fs.existsSync(fotoPath)) {
         const fotoBuffer = fs.readFileSync(fotoPath);
         const ext = path.extname(fotoPath).toLowerCase();
-        const mimeType = ext === '.png' ? 'image/png' : ext === '.gif' ? 'image/gif' : 'image/jpeg';
+        const mimeType =
+          ext === '.png'
+            ? 'image/png'
+            : ext === '.gif'
+              ? 'image/gif'
+              : 'image/jpeg';
         fotoDataUri = `data:${mimeType};base64,${fotoBuffer.toString('base64')}`;
       } else {
         console.warn('Foto tidak ditemukan di path lokal:', fotoPath);

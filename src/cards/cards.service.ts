@@ -120,7 +120,9 @@ export class CardsService {
    * Men-generate dan mengembalikan buffer PDF kartu pendaftaran.
    * Dipanggil oleh controller untuk di-stream sebagai file download.
    */
-  async downloadMyCard(userId: number): Promise<{ buffer: Buffer; filename: string }> {
+  async downloadMyCard(
+    userId: number,
+  ): Promise<{ buffer: Buffer; filename: string }> {
     try {
       // 1. Ambil data siswa (anti-IDOR via JWT userId)
       const student = await this.prisma.students.findUnique({
@@ -263,7 +265,9 @@ export class CardsService {
       });
 
       if (!existing) {
-        throw new NotFoundException(`Jadwal test dengan ID ${id} tidak ditemukan`);
+        throw new NotFoundException(
+          `Jadwal test dengan ID ${id} tidak ditemukan`,
+        );
       }
 
       const updated = await this.prisma.test_schedules.update({
@@ -298,7 +302,9 @@ export class CardsService {
       });
 
       if (!existing) {
-        throw new NotFoundException(`Jadwal test dengan ID ${id} tidak ditemukan`);
+        throw new NotFoundException(
+          `Jadwal test dengan ID ${id} tidak ditemukan`,
+        );
       }
 
       await this.prisma.test_schedules.delete({ where: { id } });

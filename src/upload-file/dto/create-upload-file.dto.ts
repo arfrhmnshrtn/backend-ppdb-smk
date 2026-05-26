@@ -2,7 +2,6 @@ import { IsString, IsOptional, IsEnum } from 'class-validator';
 import { Jurusan } from '../../../generated/prisma/enums';
 
 export class CreateUploadFileDto {
-
   @IsString()
   nama!: string;
 
@@ -23,5 +22,4 @@ export class CreateUploadFileDto {
 
   @IsEnum(Jurusan)
   jurusan!: Jurusan;
-
 }

@@ -31,3 +31,4 @@ export class AnnouncementsController {
     return this.announcementsService.getMyAnnouncement(userId);
   }
 }
+
