@@ -51,6 +51,18 @@ export class NilaiScoresController {
     };
   }
 
+  @Get('status')
+  async findScoreStatus(@Query() query: QueryNilaiScoreDto) {
+    const result = await this.nilaiScoresService.findScoreStatus(query);
+    return {
+      success: true,
+      status: HttpStatus.OK,
+      meta: result.meta,
+      message: 'Data status nilai student berhasil diambil',
+      data: result.data,
+    };
+  }
+
   @Get('student/:studentId')
   async findByStudentId(@Param('studentId', ParseIntPipe) studentId: number) {
     const data = await this.nilaiScoresService.findByStudentId(studentId);

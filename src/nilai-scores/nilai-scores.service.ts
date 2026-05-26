@@ -102,6 +102,58 @@ export class NilaiScoresService {
     };
   }
 
+  async findScoreStatus(query: QueryNilaiScoreDto) {
+    const { page = 1, limit = 10, search, major, isScored } = query;
+    const skip = (page - 1) * limit;
+
+    const whereClause: Prisma.studentsWhereInput = {};
+
+    if (search) {
+      whereClause.nama = {
+        contains: search,
+      };
+    }
+    if (major) {
+      whereClause.jurusan = major as any;
+    }
+
+    if (isScored !== undefined) {
+      if (isScored) {
+        whereClause.nilaiScore = {
+          isNot: null,
+        };
+      } else {
+        whereClause.nilaiScore = {
+          is: null,
+        };
+      }
+    }
+
+    const [total, data] = await Promise.all([
+      PrismaService.students.count({ where: whereClause }),
+      PrismaService.students.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        orderBy: {
+          created_at: 'desc',
+        },
+        include: {
+          nilaiScore: true,
+        },
+      }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+      },
+    };
+  }
+
   async findOne(id: string) {
     const score = await PrismaService.nilai_scores.findUnique({
       where: { id },

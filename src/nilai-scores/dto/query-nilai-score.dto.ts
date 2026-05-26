@@ -1,5 +1,5 @@
-import { IsOptional, IsInt, Min, IsString, IsEnum } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsOptional, IsInt, Min, IsString, IsEnum, IsBoolean } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 import { Jurusan } from '../../../generated/prisma/client';
 
 export class QueryNilaiScoreDto {
@@ -22,4 +22,13 @@ export class QueryNilaiScoreDto {
   @IsOptional()
   @IsEnum(Jurusan)
   major?: Jurusan;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
+  @IsBoolean()
+  isScored?: boolean;
 }
