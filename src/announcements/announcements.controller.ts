@@ -8,7 +8,7 @@ import { user_role } from '../../generated/prisma/client';
 
 @Controller('announcements')
 export class AnnouncementsController {
-  constructor(private readonly announcementsService: AnnouncementsService) {}
+  constructor(private readonly announcementsService: AnnouncementsService) { }
 
   @Post('generate')
   @UseGuards(AuthGuard, RolesGuard)

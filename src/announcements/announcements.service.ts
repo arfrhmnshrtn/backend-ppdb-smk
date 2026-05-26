@@ -20,7 +20,7 @@ export class AnnouncementsService {
     try {
       // 1. Fetch all student rankings
       const rankings = await this.prisma.student_ranking.findMany();
-      
+
       const newAnnouncements: Array<{
         id_student: number;
         status: StudentAnnouncementStatus;
@@ -46,7 +46,7 @@ export class AnnouncementsService {
       // 3. Delete old announcements and create new ones in a transaction
       await this.prisma.$transaction(async (tx) => {
         await tx.student_announcements.deleteMany({});
-        
+
         if (newAnnouncements.length > 0) {
           await tx.student_announcements.createMany({
             data: newAnnouncements,
@@ -70,7 +70,7 @@ export class AnnouncementsService {
   async schedulePublish(dto: ScheduleAnnouncementDto) {
     try {
       const publishDate = new Date(dto.published_at);
-      
+
       const updateResult = await this.prisma.student_announcements.updateMany({
         data: {
           published_at: publishDate,
@@ -112,7 +112,40 @@ export class AnnouncementsService {
         };
       }
 
-      if (!announcement.is_published) {
+      const now = new Date();
+      const isPublished = announcement.is_published || (announcement.published_at && now >= new Date(announcement.published_at));
+
+      if (!isPublished) {
+        if (announcement.published_at) {
+          const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+          const months = [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+          ];
+          const date = new Date(announcement.published_at);
+          const hari = days[date.getDay()];
+          const tanggal = `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+          const jam = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+          const diffMs = date.getTime() - now.getTime();
+          const hours = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60)));
+          const minutes = Math.max(0, Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)));
+          const seconds = Math.max(0, Math.floor((diffMs % (1000 * 60)) / 1000));
+          const countdown = `${hours} jam, ${minutes} menit, ${seconds} detik lagi`;
+
+          return {
+            success: false,
+            message: 'Pengumuman belum tersedia',
+            data: {
+              hari,
+              tanggal,
+              jam,
+              published_at: announcement.published_at,
+              countdown,
+            },
+          };
+        }
+
         return {
           success: false,
           message: 'Pengumuman belum tersedia',
