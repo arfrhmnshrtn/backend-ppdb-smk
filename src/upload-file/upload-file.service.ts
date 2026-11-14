@@ -290,7 +290,7 @@ export class UploadFileService {
 
       const studentsData = await this.prisma.students.findMany({
         include: {
-          user: { select: { email: true } },
+          user: { select: { no_hp: true } },
           documents: {
             include: {
               document_type: true,
@@ -320,8 +320,7 @@ export class UploadFileService {
           id: student.id,
           no_daftar: student.no_daftar,
           nama: student.nama,
-          email: student.user.email,
-          no_hp: student.no_hp,
+          no_hp: student.no_hp || student.user.no_hp,
           nisn: student.nisn,
           asal_sekolah: student.asal_sekolah,
           akreditasi_sekolah: student.akreditasi_sekolah,
@@ -363,7 +362,7 @@ export class UploadFileService {
       const studentData = await this.prisma.students.findUnique({
         where: { id: studentId },
         include: {
-          user: { select: { email: true } },
+          user: { select: { no_hp: true } },
           documents: {
             include: {
               document_type: true,
@@ -408,8 +407,7 @@ export class UploadFileService {
           id: studentData.id,
           no_daftar: studentData.no_daftar,
           nama: studentData.nama,
-          email: studentData.user.email,
-          no_hp: studentData.no_hp,
+          no_hp: studentData.no_hp || studentData.user.no_hp,
           nisn: studentData.nisn,
           asal_sekolah: studentData.asal_sekolah,
           akreditasi_sekolah: studentData.akreditasi_sekolah,

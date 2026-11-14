@@ -24,6 +24,13 @@ export class AnnouncementsController {
     return this.announcementsService.schedulePublish(dto);
   }
 
+  @Get('schedule')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(user_role.ADMIN)
+  async getSchedulePublish() {
+    return this.announcementsService.getSchedulePublish();
+  }
+
   @Get('me')
   @UseGuards(AuthGuard)
   async getMyAnnouncement(@Request() req: any) {

@@ -91,6 +91,44 @@ export class AnnouncementsService {
     }
   }
 
+  async getSchedulePublish() {
+    try {
+      const announcement =
+        await this.prisma.student_announcements.findFirst({
+          select: {
+            published_at: true,
+          },
+          where: {
+            published_at: {
+              not: null,
+            },
+          },
+        });
+
+      const publishedAt = announcement?.published_at
+        ? announcement.published_at.toLocaleString('id-ID', {
+          timeZone: 'Asia/Jakarta',
+          dateStyle: 'full',
+          timeStyle: 'short',
+        })
+        : null;
+
+      return {
+        success: true,
+        message: 'Berhasil mengambil jadwal pengumuman',
+        data: {
+          published_at: publishedAt,
+        },
+      };
+    } catch (error) {
+      console.error('Error getSchedulePublish:', error);
+
+      throw new InternalServerErrorException(
+        'Gagal mengambil jadwal pengumuman',
+      );
+    }
+  }
+
   async getMyAnnouncement(userId: number) {
     try {
       const student = await this.prisma.students.findUnique({

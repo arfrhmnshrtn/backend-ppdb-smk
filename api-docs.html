@@ -498,7 +498,7 @@
               <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Payload JWT Structure</span>
               <pre class="bg-slate-950/80 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-emerald-400">{
   <span class="text-blue-400">"sub"</span>: 1, <span class="text-slate-500">// User / Admin ID</span>
-  <span class="text-blue-400">"email"</span>: <span class="text-slate-300">"haris@example.com"</span>,
+  <span class="text-blue-400">"no_hp"</span>: <span class="text-slate-300">"081234567890"</span>,
   <span class="text-blue-400">"role"</span>: <span class="text-slate-300">"USER"</span> <span class="text-slate-500">// Nilai: "USER" atau "ADMIN"</span>
 }</pre>
             </div>
@@ -562,10 +562,10 @@
                         <td class="p-3 text-slate-400 font-mono text-[10px]">IsString(), IsNotEmpty()</td>
                       </tr>
                       <tr>
-                        <td class="p-3 font-mono text-blue-400">email</td>
+                        <td class="p-3 font-mono text-blue-400">no_hp</td>
                         <td class="p-3 text-slate-300">string</td>
                         <td class="p-3"><span class="text-red-400 font-semibold">Required</span></td>
-                        <td class="p-3 text-slate-400 font-mono text-[10px]">IsString(), IsNotEmpty(), Email</td>
+                        <td class="p-3 text-slate-400 font-mono text-[10px]">IsString(), IsNotEmpty()</td>
                       </tr>
                       <tr>
                         <td class="p-3 font-mono text-blue-400">password</td>
@@ -584,7 +584,7 @@
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Payload JSON</span>
                 <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
   <span class="token-key">"name"</span>: <span class="token-string">"Haris Setiawan"</span>,
-  <span class="token-key">"email"</span>: <span class="token-string">"haris@example.com"</span>,
+  <span class="token-key">"no_hp"</span>: <span class="token-string">"081234567890"</span>,
   <span class="token-key">"password"</span>: <span class="token-string">"rahasia123"</span>
 }</pre>
               </div>
@@ -619,7 +619,7 @@
   <span class="token-key">"data"</span>: {
     <span class="token-key">"id"</span>: <span class="token-number">1</span>,
     <span class="token-key">"name"</span>: <span class="token-string">"Haris Setiawan"</span>,
-    <span class="token-key">"email"</span>: <span class="token-string">"haris@example.com"</span>,
+    <span class="token-key">"no_hp"</span>: <span class="token-string">"081234567890"</span>,
     <span class="token-key">"token"</span>: <span class="token-string">"eyJhbGciOiJIUz..."</span>
   }
 }</pre>

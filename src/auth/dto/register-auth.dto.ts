@@ -7,7 +7,7 @@ export class RegisterAuthDto {
 
   @IsString()
   @IsNotEmpty()
-  email!: string;
+  no_hp!: string;
 
   @IsString()
   @IsNotEmpty()

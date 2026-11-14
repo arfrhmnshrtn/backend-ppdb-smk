@@ -41,10 +41,9 @@ export class UsersService {
         data: users.map((user) => ({
           idUser: user.id,
           no_daftar: user.students?.no_daftar || null,
-          email: user.email,
-          nama: user.students?.nama || null,
+          nama: user.students?.nama || user.name || null,
           jurusan: user.students?.jurusan || null,
-          no_hp: user.students?.no_hp || null,
+          no_hp: user.students?.no_hp || user.no_hp || null,
           nisn: user.students?.nisn || null,
           asal_sekolah: user.students?.asal_sekolah || null,
           akreditasi_sekolah: user.students?.akreditasi_sekolah || null,

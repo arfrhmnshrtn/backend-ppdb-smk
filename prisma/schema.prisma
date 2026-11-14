@@ -53,7 +53,7 @@ model documents {
 
 model user {
   id        Int       @id @default(autoincrement())
-  email     String    @unique(map: "User_email_key")
+  no_hp     String    @unique(map: "User_no_hp_key")
   name      String?
   password  String
   createdAt DateTime  @default(now())

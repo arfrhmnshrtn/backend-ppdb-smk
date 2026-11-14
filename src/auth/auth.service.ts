@@ -21,13 +21,13 @@ export class AuthService {
   // register user
   async register(registerAuthDto: RegisterAuthDto) {
     try {
-      const { name, email, password } = registerAuthDto;
+      const { name, no_hp, password } = registerAuthDto;
 
       const existingUser = await this.prisma.user.findUnique({
-        where: { email },
+        where: { no_hp },
       });
       if (existingUser) {
-        throw new BadRequestException('Email sudah terdaftar');
+        throw new BadRequestException('Nomor HP sudah terdaftar');
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,7 +35,7 @@ export class AuthService {
       await this.prisma.user.create({
         data: {
           name,
-          email,
+          no_hp,
           password: hashedPassword,
         },
       });
@@ -60,13 +60,13 @@ export class AuthService {
   // register admin
   async registerAdmin(registerAuthDto: RegisterAuthDto) {
     try {
-      const { name, email, password } = registerAuthDto;
+      const { name, no_hp, password } = registerAuthDto;
 
       const existingUser = await this.prisma.user.findUnique({
-        where: { email },
+        where: { no_hp },
       });
       if (existingUser) {
-        throw new BadRequestException('Email sudah terdaftar');
+        throw new BadRequestException('Nomor HP sudah terdaftar');
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -74,7 +74,7 @@ export class AuthService {
       await this.prisma.user.create({
         data: {
           name,
-          email,
+          no_hp,
           password: hashedPassword,
           role: 'ADMIN',
         },
@@ -100,27 +100,27 @@ export class AuthService {
   // login user
   async login(loginAuthDto: LoginAuthDto) {
     try {
-      const { email, password } = loginAuthDto;
+      const { no_hp, password } = loginAuthDto;
       const user = await this.prisma.user.findUnique({
         where: {
-          email,
+          no_hp,
         },
       });
 
       if (user?.role !== 'USER') {
-        throw new UnauthorizedException('Email atau password salah');
+        throw new UnauthorizedException('Nomor HP atau password salah');
       }
 
       if (!user) {
-        throw new UnauthorizedException('Email atau password salah');
+        throw new UnauthorizedException('Nomor HP atau password salah');
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        throw new UnauthorizedException('Email atau password salah');
+        throw new UnauthorizedException('Nomor HP atau password salah');
       }
 
-      const payload = { sub: user.id, email: user.email, role: user.role };
+      const payload = { sub: user.id, no_hp: user.no_hp, role: user.role };
       const token = await this.jwtService.signAsync(payload);
 
       return {
@@ -129,7 +129,7 @@ export class AuthService {
         data: {
           id: user.id,
           name: user.name,
-          email: user.email,
+          no_hp: user.no_hp,
           token,
         },
       };
@@ -149,27 +149,27 @@ export class AuthService {
   // login admin
   async loginAdmin(loginAuthDto: LoginAuthDto) {
     try {
-      const { email, password } = loginAuthDto;
+      const { no_hp, password } = loginAuthDto;
       const user = await this.prisma.user.findUnique({
         where: {
-          email,
+          no_hp,
         },
       });
 
       if (user?.role !== 'ADMIN') {
-        throw new UnauthorizedException('Email atau password salah');
+        throw new UnauthorizedException('Nomor HP atau password salah');
       }
 
       if (!user) {
-        throw new UnauthorizedException('Email atau password salah');
+        throw new UnauthorizedException('Nomor HP atau password salah');
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        throw new UnauthorizedException('Email atau password salah');
+        throw new UnauthorizedException('Nomor HP atau password salah');
       }
 
-      const payload = { sub: user.id, email: user.email, role: user.role };
+      const payload = { sub: user.id, no_hp: user.no_hp, role: user.role };
       const token = await this.jwtService.signAsync(payload);
 
       return {
@@ -178,7 +178,7 @@ export class AuthService {
         data: {
           id: user.id,
           name: user.name,
-          email: user.email,
+          no_hp: user.no_hp,
           token,
         },
       };
