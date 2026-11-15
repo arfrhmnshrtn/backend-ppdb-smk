@@ -9,6 +9,8 @@ import {
 import { RegisterAuthDto } from './dto/register-auth.dto.js';
 import { PrismaService } from '../lib/prisma.service.js';
 import { LoginAuthDto } from './dto/login-auth.dto.js';
+import { RegisterAdminAuthDto } from './dto/register-admin-auth.dto.js';
+import { LoginAdminAuthDto } from './dto/login-admin-auth.dto.js';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
@@ -58,15 +60,22 @@ export class AuthService {
   }
 
   // register admin
-  async registerAdmin(registerAuthDto: RegisterAuthDto) {
+  async registerAdmin(registerAdminAuthDto: RegisterAdminAuthDto) {
     try {
-      const { name, no_hp, password } = registerAuthDto;
+      const { name, username, no_hp, password } = registerAdminAuthDto;
 
-      const existingUser = await this.prisma.user.findUnique({
+      const existingNoHp = await this.prisma.user.findUnique({
         where: { no_hp },
       });
-      if (existingUser) {
+      if (existingNoHp) {
         throw new BadRequestException('Nomor HP sudah terdaftar');
+      }
+
+      const existingUsername = await this.prisma.user.findUnique({
+        where: { username },
+      });
+      if (existingUsername) {
+        throw new BadRequestException('Username sudah terdaftar');
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -74,6 +83,7 @@ export class AuthService {
       await this.prisma.user.create({
         data: {
           name,
+          username,
           no_hp,
           password: hashedPassword,
           role: 'ADMIN',
@@ -147,29 +157,34 @@ export class AuthService {
   }
 
   // login admin
-  async loginAdmin(loginAuthDto: LoginAuthDto) {
+  async loginAdmin(loginAdminAuthDto: LoginAdminAuthDto) {
     try {
-      const { no_hp, password } = loginAuthDto;
+      const { username, password } = loginAdminAuthDto;
       const user = await this.prisma.user.findUnique({
         where: {
-          no_hp,
+          username,
         },
       });
 
       if (user?.role !== 'ADMIN') {
-        throw new UnauthorizedException('Nomor HP atau password salah');
+        throw new UnauthorizedException('Username atau password salah');
       }
 
       if (!user) {
-        throw new UnauthorizedException('Nomor HP atau password salah');
+        throw new UnauthorizedException('Username atau password salah');
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        throw new UnauthorizedException('Nomor HP atau password salah');
+        throw new UnauthorizedException('Username atau password salah');
       }
 
-      const payload = { sub: user.id, no_hp: user.no_hp, role: user.role };
+      const payload = {
+        sub: user.id,
+        username: user.username,
+        no_hp: user.no_hp,
+        role: user.role,
+      };
       const token = await this.jwtService.signAsync(payload);
 
       return {
@@ -178,6 +193,7 @@ export class AuthService {
         data: {
           id: user.id,
           name: user.name,
+          username: user.username,
           no_hp: user.no_hp,
           token,
         },

@@ -54,6 +54,7 @@ model documents {
 model user {
   id        Int       @id @default(autoincrement())
   no_hp     String    @unique(map: "User_no_hp_key")
+  username  String?   @unique(map: "User_username_key")
   name      String?
   password  String
   createdAt DateTime  @default(now())
