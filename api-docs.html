@@ -201,9 +201,21 @@
           <div class="module-group" data-module="user-auth">
             <span class="text-[9px] uppercase font-semibold text-slate-500 px-2 block mb-1">Akun & Auth Siswa</span>
             <ul class="space-y-1 text-xs">
-              <li class="sidebar-item" data-search-term="post auth register siswa user">
+              <li class="sidebar-item" data-search-term="post auth register siswa user otp whatsapp">
                 <a href="#auth-register" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
-                  <span class="truncate">Register Akun</span>
+                  <span class="truncate">Register & Request OTP</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="post auth verify otp verifikasi whatsapp">
+                <a href="#auth-verify-otp" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Verifikasi OTP</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
+                </a>
+              </li>
+              <li class="sidebar-item" data-search-term="post auth resend otp kirim ulang whatsapp">
+                <a href="#auth-resend-otp" class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                  <span class="truncate">Kirim Ulang OTP</span>
                   <span class="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500/20 text-blue-300">POST</span>
                 </a>
               </li>
@@ -538,7 +550,7 @@
             <div class="md:col-span-7 space-y-5">
               <div>
                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Deskripsi</h4>
-                <p class="text-sm text-slate-300">Pendaftaran akun baru untuk calon peserta didik baru (Siswa).</p>
+                <p class="text-sm text-slate-300">Tahap 1 pendaftaran akun calon peserta didik baru. Menyimpan data registrasi sementara dan mengirimkan kode OTP 4 digit ke nomor WhatsApp via Fonnte API (berlaku 5 menit, cooldown kirim ulang 60 detik).</p>
               </div>
 
               <!-- Request Body -->
@@ -565,7 +577,7 @@
                         <td class="p-3 font-mono text-blue-400">no_hp</td>
                         <td class="p-3 text-slate-300">string</td>
                         <td class="p-3"><span class="text-red-400 font-semibold">Required</span></td>
-                        <td class="p-3 text-slate-400 font-mono text-[10px]">IsString(), IsNotEmpty()</td>
+                        <td class="p-3 text-slate-400 font-mono text-[10px]">IsString(), IsNotEmpty(), Format WA Indonesia</td>
                       </tr>
                       <tr>
                         <td class="p-3 font-mono text-blue-400">password</td>
@@ -588,6 +600,55 @@
   <span class="token-key">"password"</span>: <span class="token-string">"rahasia123"</span>
 }</pre>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1b. POST Verify OTP -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="auth-verify-otp" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/auth/verify-otp</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-semibold border border-white/5">PUBLIC</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <p class="text-sm text-slate-300">Tahap 2 pendaftaran: memverifikasi 4 digit kode OTP WhatsApp (maksimal 5 kali percobaan, masa berlaku 5 menit) dan mengaktifkan akun siswa di database.</p>
+            </div>
+            <div class="md:col-span-5 space-y-4">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"no_hp"</span>: <span class="token-string">"081234567890"</span>,
+  <span class="token-key">"otp"</span>: <span class="token-string">"4829"</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1c. POST Resend OTP -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="auth-resend-otp" data-role="user">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/auth/resend-otp</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-semibold border border-white/5">PUBLIC</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <p class="text-sm text-slate-300">Mengirim ulang kode OTP 4 digit baru ke nomor WhatsApp pendaftar yang belum terverifikasi (cooldown 60 detik, otomatis membatalkan OTP sebelumnya).</p>
+            </div>
+            <div class="md:col-span-5 space-y-4">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"no_hp"</span>: <span class="token-string">"081234567890"</span>
+}</pre>
             </div>
           </div>
         </div>

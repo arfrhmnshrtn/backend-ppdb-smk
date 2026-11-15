@@ -62,6 +62,19 @@ model user {
   students  students?
 }
 
+model registration_otps {
+  id                  String    @id @default(cuid())
+  phone_number        String    @unique(map: "RegistrationOtp_phone_number_key")
+  registration_data   Json
+  otp_hash            String
+  expires_at          DateTime
+  attempts            Int       @default(0)
+  resend_available_at DateTime
+  verified_at         DateTime?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+}
+
 model test_schedules {
   id           Int      @id @default(autoincrement())
   tanggal_test DateTime

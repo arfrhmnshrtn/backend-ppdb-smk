@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service.js';
-import { AuthController } from './auth.controller.js';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
+import { FonnteService } from './fonnte.service';
+import { OtpRateLimitGuard } from './guards/otp-rate-limit.guard';
 
 @Module({
   imports: [
@@ -12,6 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, FonnteService, OtpRateLimitGuard],
+  exports: [AuthService, FonnteService],
 })
 export class AuthModule {}
