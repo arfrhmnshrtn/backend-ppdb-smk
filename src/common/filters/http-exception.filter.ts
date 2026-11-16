@@ -20,6 +20,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
       status = exception.getStatus();
       const exceptionResponse: any = exception.getResponse();
       message = exceptionResponse.message || exception.message;
+
+      if (
+        status === HttpStatus.PAYLOAD_TOO_LARGE ||
+        message === 'File too large'
+      ) {
+        message =
+          'Ukuran file terlalu besar. Maksimal ukuran file yang diizinkan adalah 5MB.';
+      }
     }
 
     // Format response yang konsisten

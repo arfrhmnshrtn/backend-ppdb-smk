@@ -27,11 +27,28 @@ export type UploadFileFields = {
   sk_pramuka?: Express.Multer.File[];
 };
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 @Injectable()
 export class UploadFileService {
   private readonly prisma = PrismaService;
 
   constructor(private validationsService: ValidationsService) {}
+
+  private validateUploadedFilesSize(files: UploadFileFields) {
+    if (!files) return;
+    for (const [fieldName, fileArray] of Object.entries(files)) {
+      if (fileArray && fileArray.length > 0) {
+        for (const file of fileArray) {
+          if (file.size > MAX_FILE_SIZE) {
+            throw new BadRequestException(
+              `Ukuran file pada ${fieldName} melebihi batas maksimal 5MB`,
+            );
+          }
+        }
+      }
+    }
+  }
 
   private async processDocument(
     studentId: number,
@@ -97,6 +114,8 @@ export class UploadFileService {
     userId: number,
   ) {
     try {
+      this.validateUploadedFilesSize(files);
+
       const existingStudent = await this.prisma.students.findFirst({
         where: { id_user: userId },
       });
@@ -182,6 +201,8 @@ export class UploadFileService {
     userId: number,
   ) {
     try {
+      this.validateUploadedFilesSize(files);
+
       const student = await this.prisma.students.findFirst({
         where: { id_user: userId },
         include: {

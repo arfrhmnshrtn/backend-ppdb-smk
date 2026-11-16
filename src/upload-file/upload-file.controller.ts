@@ -5,22 +5,24 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  BadRequestException,
+  UseInterceptors,
+  UploadedFiles,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UploadFileService } from './upload-file.service';
 import { CreateUploadFileDto } from './dto/create-upload-file.dto';
 import { UpdateUploadFileDto } from './dto/update-upload-file.dto';
 import * as fs from 'fs';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { UseInterceptors, UploadedFiles, UseGuards, Req } from '@nestjs/common';
+import * as crypto from 'crypto';
 import { diskStorage } from 'multer';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { AuthGuard } from '../auth/auth.guard';
 import { CleanUploadedFilesInterceptor } from '../common/interceptors/file-cleanup.interceptor';
 
 const uploadPath = './uploads';
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath);
@@ -61,20 +63,21 @@ export class UploadFileController {
             cb(null, folderPath);
           },
           filename: (req, file, cb) => {
-            const crypto = require('crypto');
             const fileExt = file.originalname.split('.').pop();
             const uniqueName = crypto.randomUUID() + '.' + fileExt;
             cb(null, uniqueName);
           },
         }),
         limits: {
-          fileSize: 5 * 1024 * 1024, // 5MB limit
+          fileSize: MAX_FILE_SIZE, // Maksimal 5MB per file
         },
         fileFilter: (req, file, cb) => {
           // Hanya izinkan PDF dan gambar (jpeg, png)
           if (!file.originalname.match(/\.(pdf|jpg|jpeg|png)$/i)) {
             return cb(
-              new Error('Hanya file PDF dan gambar yang diizinkan!'),
+              new BadRequestException(
+                'Hanya file PDF dan gambar (JPG, JPEG, PNG) yang diizinkan!',
+              ),
               false,
             );
           }
@@ -137,20 +140,21 @@ export class UploadFileController {
             cb(null, folderPath);
           },
           filename: (req, file, cb) => {
-            const crypto = require('crypto');
             const fileExt = file.originalname.split('.').pop();
             const uniqueName = crypto.randomUUID() + '.' + fileExt;
             cb(null, uniqueName);
           },
         }),
         limits: {
-          fileSize: 5 * 1024 * 1024, // 5MB limit
+          fileSize: MAX_FILE_SIZE, // Maksimal 5MB per file
         },
         fileFilter: (req, file, cb) => {
           // Hanya izinkan PDF dan gambar (jpeg, png)
           if (!file.originalname.match(/\.(pdf|jpg|jpeg|png)$/i)) {
             return cb(
-              new Error('Hanya file PDF dan gambar yang diizinkan!'),
+              new BadRequestException(
+                'Hanya file PDF dan gambar (JPG, JPEG, PNG) yang diizinkan!',
+              ),
               false,
             );
           }
