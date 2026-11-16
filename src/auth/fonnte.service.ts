@@ -36,22 +36,12 @@ export class FonnteService {
     return token;
   }
 
-  async sendOtpMessage(
+  async sendWhatsAppMessage(
     phoneNumber: string,
-    otp: string,
-    recipientName?: string,
-  ): Promise<void> {
+    message: string,
+  ): Promise<FonnteApiResponse> {
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
     const token = this.getApiKey();
-
-    const greeting = recipientName ? `Halo *${recipientName}*,` : 'Halo,';
-    const message = [
-      greeting,
-      '',
-      `Kode OTP registrasi PPDB SMK Anda adalah: *${otp}*`,
-      '',
-      'Kode ini berlaku selama *5 menit*. Jangan berikan kode ini kepada siapa pun.',
-    ].join('\n');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
@@ -80,7 +70,8 @@ export class FonnteService {
       const result = (await response.json()) as FonnteApiResponse;
 
       if (result.status === false) {
-        const reason = result.reason || result.detail || 'Pengiriman pesan ditolak';
+        const reason =
+          result.reason || result.detail || 'Pengiriman pesan ditolak';
         if (
           reason.toLowerCase().includes('invalid') ||
           reason.toLowerCase().includes('target') ||
@@ -94,6 +85,11 @@ export class FonnteService {
           `Gagal mengirim pesan WhatsApp: ${reason}`,
         );
       }
+
+      return {
+        status: true,
+        detail: result.detail || 'Pesan WhatsApp berhasil dikirim',
+      };
     } catch (error) {
       if (
         error instanceof BadRequestException ||
@@ -110,10 +106,27 @@ export class FonnteService {
       }
 
       throw new BadGatewayException(
-        'Gagal mengirim kode OTP ke WhatsApp. Pastikan nomor aktif dan coba lagi',
+        'Gagal mengirim pesan ke WhatsApp. Pastikan nomor aktif dan coba lagi',
       );
     } finally {
       clearTimeout(timeoutId);
     }
+  }
+
+  async sendOtpMessage(
+    phoneNumber: string,
+    otp: string,
+    recipientName?: string,
+  ): Promise<void> {
+    const greeting = recipientName ? `Halo *${recipientName}*,` : 'Halo,';
+    const message = [
+      greeting,
+      '',
+      `Kode OTP registrasi PPDB SMK Anda adalah: *${otp}*`,
+      '',
+      'Kode ini berlaku selama *5 menit*. Jangan berikan kode ini kepada siapa pun.',
+    ].join('\n');
+
+    await this.sendWhatsAppMessage(phoneNumber, message);
   }
 }

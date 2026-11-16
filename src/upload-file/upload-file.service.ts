@@ -317,6 +317,10 @@ export class UploadFileService {
               document_type: true,
             },
           },
+          whatsappNotifications: {
+            orderBy: { created_at: 'desc' },
+            take: 1,
+          },
         },
       });
 
@@ -337,6 +341,8 @@ export class UploadFileService {
           };
         });
 
+        const latestWa = student.whatsappNotifications?.[0] || null;
+
         return {
           id: student.id,
           no_daftar: student.no_daftar,
@@ -349,6 +355,17 @@ export class UploadFileService {
           jurusan: student.jurusan,
           created_at: student.created_at,
           berkas: files,
+          whatsapp_notification: latestWa
+            ? {
+                id: latestWa.id,
+                status: latestWa.status,
+                attempts: latestWa.attempts,
+                can_retry: latestWa.status !== 'SENT' && latestWa.attempts < 5,
+                fonnte_response: latestWa.fonnte_response,
+                sent_at: latestWa.sent_at,
+                last_attempt_at: latestWa.last_attempt_at,
+              }
+            : null,
         };
       });
 
@@ -389,6 +406,10 @@ export class UploadFileService {
               document_type: true,
             },
           },
+          whatsappNotifications: {
+            orderBy: { created_at: 'desc' },
+            take: 1,
+          },
         },
       });
 
@@ -418,6 +439,8 @@ export class UploadFileService {
         };
       });
 
+      const latestWa = studentData.whatsappNotifications?.[0] || null;
+
       return {
         status: true,
         message: 'Data berkas berhasil ditemukan',
@@ -436,6 +459,17 @@ export class UploadFileService {
           jurusan: studentData.jurusan,
           created_at: studentData.created_at,
           berkas: files,
+          whatsapp_notification: latestWa
+            ? {
+                id: latestWa.id,
+                status: latestWa.status,
+                attempts: latestWa.attempts,
+                can_retry: latestWa.status !== 'SENT' && latestWa.attempts < 5,
+                fonnte_response: latestWa.fonnte_response,
+                sent_at: latestWa.sent_at,
+                last_attempt_at: latestWa.last_attempt_at,
+              }
+            : null,
         },
       };
     } catch (error) {

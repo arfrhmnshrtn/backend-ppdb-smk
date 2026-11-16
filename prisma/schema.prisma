@@ -25,8 +25,9 @@ model students {
   user                 user                   @relation(fields: [id_user], references: [id])
   raporScores          RaporScore[]
   nilaiScore           nilai_scores?
-  studentAnnouncements student_announcements?
-  studentRanking       student_ranking?
+  studentAnnouncements  student_announcements?
+  studentRanking        student_ranking?
+  whatsappNotifications whatsapp_notifications[]
 }
 
 model document_types {
@@ -186,4 +187,28 @@ enum StudentAnnouncementStatus {
   PASSED
   FAILED
   RESERVE
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model whatsapp_notifications {
+  id                 String             @id @default(cuid())
+  id_student         Int
+  phone_number       String
+  message            String             @db.Text
+  validation_summary Json?
+  status             NotificationStatus @default(PENDING)
+  attempts           Int                @default(0)
+  fonnte_response    String?            @db.Text
+  sent_at            DateTime?
+  last_attempt_at    DateTime?
+  created_at         DateTime           @default(now())
+  updated_at         DateTime           @updatedAt
+  student            students           @relation(fields: [id_student], references: [id], onDelete: Cascade)
+
+  @@index([id_student], map: "whatsapp_notifications_id_student_fkey")
 }

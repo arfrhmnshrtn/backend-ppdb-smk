@@ -1044,14 +1044,14 @@
           
           <div class="p-6 grid md:grid-cols-12 gap-6">
             <div class="md:col-span-7 space-y-4">
-              <p class="text-sm text-slate-300">Memvalidasi banyak berkas sekaligus milik calon siswa tertentu (bulk verification) dalam satu request.</p>
+              <p class="text-sm text-slate-300">Memvalidasi banyak berkas sekaligus milik calon siswa tertentu (bulk verification) dalam satu request. Mengirimkan 1 pesan WhatsApp kolektif berisi seluruh dokumen yang berubah status (APPROVED, REVISI, REJECTED).</p>
             </div>
             <div class="md:col-span-5">
               <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
   <span class="token-key">"documents"</span>: [
     {
       <span class="token-key">"document_id"</span>: <span class="token-string">"doc-uuid-a"</span>,
-      <span class="token-key">"status"</span>: <span class="token-string">"VERIFIED"</span>,
+      <span class="token-key">"status"</span>: <span class="token-string">"APPROVED"</span>,
       <span class="token-key">"keterangan"</span>: <span class="token-boolean">null</span>
     },
     {
@@ -1060,6 +1060,39 @@
       <span class="token-key">"keterangan"</span>: <span class="token-string">"KTP Buram"</span>
     }
   ]
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5b. GET & POST Riwayat & Retry Notifikasi WhatsApp -->
+        <div class="glass-card rounded-2xl overflow-hidden scroll-mt-24 endpoint-card" id="validations-notifications" data-role="admin">
+          <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">GET</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/validations/notifications</code>
+              <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">POST</span>
+              <code class="text-sm font-semibold font-mono text-slate-200">/validations/notifications/:id/retry</code>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-extrabold border border-blue-500/20 tracking-wider">JWT AUTH</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-semibold border border-blue-500/20">ROLE: ADMIN</span>
+            </div>
+          </div>
+          
+          <div class="p-6 grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <p class="text-sm text-slate-300">Memantau riwayat pengiriman notifikasi WhatsApp hasil validasi berkas (<code class="text-emerald-400">SENT</code>, <code class="text-red-400">FAILED</code>, <code class="text-amber-400">PENDING</code>) serta mengirim ulang notifikasi yang gagal (maksimal 5 percobaan) tanpa mengubah status dokumen.</p>
+            </div>
+            <div class="md:col-span-5">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 font-mono text-[11px] text-slate-300">{
+  <span class="token-key">"success"</span>: <span class="token-boolean">true</span>,
+  <span class="token-key">"message"</span>: <span class="token-string">"Notifikasi WhatsApp berhasil dikirim ulang"</span>,
+  <span class="token-key">"data"</span>: {
+    <span class="token-key">"id"</span>: <span class="token-string">"cnotif123"</span>,
+    <span class="token-key">"status"</span>: <span class="token-string">"SENT"</span>,
+    <span class="token-key">"attempts"</span>: <span class="token-number">2</span>
+  }
 }</pre>
             </div>
           </div>

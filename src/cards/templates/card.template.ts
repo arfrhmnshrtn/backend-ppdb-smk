@@ -502,18 +502,6 @@ export function generateCardHtml(data: CardTemplateData): string {
       </ul>
     </div>
 
-    <!-- TANDA TANGAN -->
-    <div class="signature-section">
-      <div class="signature-box">
-        <div class="sig-city">Kab. Contoh, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-        <div class="sig-title">Ketua Panitia PPDB</div>
-        <div class="sig-line">
-          <div class="sig-name">Nama Panitia, S.Pd.</div>
-          <div class="sig-nip">NIP. 19XX0101 202001 1 001</div>
-        </div>
-      </div>
-    </div>
-
     <!-- FOOTER -->
     <div class="footer">
       Dokumen ini dicetak secara otomatis oleh Sistem PPDB Online SMK Negeri 1 Contoh &mdash; ${new Date().getFullYear()}
