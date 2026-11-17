@@ -7,7 +7,7 @@ import { CreateNilaiScoreDto } from './dto/create-nilai-score.dto';
 import { UpdateNilaiScoreDto } from './dto/update-nilai-score.dto';
 import { QueryNilaiScoreDto } from './dto/query-nilai-score.dto';
 import { PrismaService } from '../lib/prisma.service';
-import { Prisma } from '../../generated/prisma/client';
+import { Jurusan, Prisma } from '../../generated/prisma/client';
 
 @Injectable()
 export class NilaiScoresService {
@@ -114,7 +114,7 @@ export class NilaiScoresService {
       };
     }
     if (major) {
-      whereClause.jurusan = major as any;
+      whereClause.jurusan = major;
     }
 
     if (isScored !== undefined) {
@@ -170,8 +170,9 @@ export class NilaiScoresService {
   }
 
   async findAllByJurusan(jurusan: string) {
+    const majorEnum = jurusan.toUpperCase() as Jurusan;
     const score = await PrismaService.nilai_scores.findMany({
-      where: { student: { jurusan: jurusan as any } },
+      where: { student: { jurusan: majorEnum } },
       include: {
         student: true,
       },
