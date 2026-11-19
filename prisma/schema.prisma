@@ -212,3 +212,11 @@ model whatsapp_notifications {
 
   @@index([id_student], map: "whatsapp_notifications_id_student_fkey")
 }
+
+model major_quotas {
+  id         Int      @id @default(autoincrement())
+  jurusan    Jurusan  @unique(map: "MajorQuota_jurusan_key")
+  quota      Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
