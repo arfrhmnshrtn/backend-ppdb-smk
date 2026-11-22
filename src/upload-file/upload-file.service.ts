@@ -126,6 +126,19 @@ export class UploadFileService {
         );
       }
 
+      const pilihan1 = dto.jurusan_pilihan_1 ?? dto.jurusan;
+      const pilihan2 = dto.jurusan_pilihan_2 ?? null;
+
+      if (!pilihan1) {
+        throw new BadRequestException('Jurusan pilihan 1 wajib diisi');
+      }
+
+      if (pilihan2 && pilihan2 === pilihan1) {
+        throw new BadRequestException(
+          'Jurusan pilihan 1 dan pilihan 2 tidak boleh sama',
+        );
+      }
+
       const crypto = require('crypto');
       const randomNum = crypto.randomInt(100000, 999999);
       const no_daftar = `SPMB-${randomNum}`;
@@ -141,7 +154,9 @@ export class UploadFileService {
           asal_sekolah: dto.asal_sekolah,
           akreditasi_sekolah: dto.akreditasi_sekolah,
           alamat: dto.alamat,
-          jurusan: dto.jurusan,
+          jurusan: pilihan1,
+          jurusan_pilihan_1: pilihan1,
+          jurusan_pilihan_2: pilihan2,
         },
       });
 
@@ -226,6 +241,16 @@ export class UploadFileService {
         );
       }
 
+      const pilihan1 = dto.jurusan_pilihan_1 ?? dto.jurusan;
+      const pilihan2 =
+        dto.jurusan_pilihan_2 !== undefined ? dto.jurusan_pilihan_2 : undefined;
+
+      if (pilihan1 && pilihan2 && pilihan1 === pilihan2) {
+        throw new BadRequestException(
+          'Jurusan pilihan 1 dan pilihan 2 tidak boleh sama',
+        );
+      }
+
       // Update data student
       await this.prisma.students.update({
         where: { id: student.id },
@@ -236,7 +261,10 @@ export class UploadFileService {
           asal_sekolah: dto.asal_sekolah,
           akreditasi_sekolah: dto.akreditasi_sekolah,
           alamat: dto.alamat,
-          jurusan: dto.jurusan,
+          ...(pilihan1
+            ? { jurusan: pilihan1, jurusan_pilihan_1: pilihan1 }
+            : {}),
+          ...(pilihan2 !== undefined ? { jurusan_pilihan_2: pilihan2 } : {}),
         },
       });
 
@@ -353,6 +381,8 @@ export class UploadFileService {
           akreditasi_sekolah: student.akreditasi_sekolah,
           alamat: student.alamat,
           jurusan: student.jurusan,
+          jurusan_pilihan_1: student.jurusan_pilihan_1 ?? student.jurusan,
+          jurusan_pilihan_2: student.jurusan_pilihan_2 ?? null,
           created_at: student.created_at,
           berkas: files,
           whatsapp_notification: latestWa
@@ -457,6 +487,9 @@ export class UploadFileService {
           akreditasi_sekolah: studentData.akreditasi_sekolah,
           alamat: studentData.alamat,
           jurusan: studentData.jurusan,
+          jurusan_pilihan_1:
+            studentData.jurusan_pilihan_1 ?? studentData.jurusan,
+          jurusan_pilihan_2: studentData.jurusan_pilihan_2 ?? null,
           created_at: studentData.created_at,
           berkas: files,
           whatsapp_notification: latestWa

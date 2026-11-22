@@ -7,7 +7,9 @@ import { PrismaService } from '../lib/prisma.service';
 import { ScheduleAnnouncementDto } from './dto/schedule-announcement.dto';
 import { SetMajorQuotaDto } from './dto/set-major-quota.dto';
 import {
+  JalurPenerimaan,
   Jurusan,
+  StatusAkhirSeleksi,
   StudentAnnouncementStatus,
 } from '../../generated/prisma/client';
 
@@ -130,7 +132,7 @@ export class AnnouncementsService {
 
   async generateAnnouncements() {
     try {
-      // 1. Fetch all student rankings & dynamic quotas from DB
+      // 1. Fetch all student rankings (already computed via 2-stage selection)
       const [rankings, quotasMap] = await Promise.all([
         this.prisma.student_ranking.findMany(),
         this.getEffectiveQuotasMap(),
@@ -139,22 +141,35 @@ export class AnnouncementsService {
       const newAnnouncements: Array<{
         id_student: number;
         status: StudentAnnouncementStatus;
+        jurusan_diterima: Jurusan | null;
+        jalur_penerimaan: JalurPenerimaan | null;
         is_published: boolean;
       }> = [];
 
-      // 2. Determine status based on ranking and quota from DB
+      // 2. Determine status from 2-stage selection result (or fallback to ranking vs quota)
       for (const rank of rankings) {
-        const quota = quotasMap[rank.jurusan];
         let status: StudentAnnouncementStatus =
           StudentAnnouncementStatus.FAILED;
+        let jurusanDiterima: Jurusan | null = rank.jurusan_diterima ?? null;
+        let jalurPenerimaan: JalurPenerimaan | null =
+          rank.jalur_penerimaan ?? null;
 
-        if (rank.ranking <= quota) {
+        if (rank.status_akhir === StatusAkhirSeleksi.DITERIMA) {
           status = StudentAnnouncementStatus.PASSED;
+        } else if (!rank.jalur_penerimaan) {
+          const quota = quotasMap[rank.jurusan];
+          if (rank.ranking <= quota) {
+            status = StudentAnnouncementStatus.PASSED;
+            jurusanDiterima = rank.jurusan;
+            jalurPenerimaan = JalurPenerimaan.PILIHAN_1;
+          }
         }
 
         newAnnouncements.push({
           id_student: rank.id_student,
           status,
+          jurusan_diterima: status === StudentAnnouncementStatus.PASSED ? jurusanDiterima : null,
+          jalur_penerimaan: status === StudentAnnouncementStatus.PASSED ? jalurPenerimaan : null,
           is_published: false,
         });
       }
@@ -337,6 +352,8 @@ export class AnnouncementsService {
         success: true,
         data: {
           status: announcement.status,
+          jurusan_diterima: announcement.jurusan_diterima,
+          jalur_penerimaan: announcement.jalur_penerimaan,
         },
       };
     } catch (error) {

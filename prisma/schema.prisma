@@ -19,6 +19,8 @@ model students {
   alamat               String
   foto                 String?
   jurusan              Jurusan
+  jurusan_pilihan_1    Jurusan?
+  jurusan_pilihan_2    Jurusan?
   created_at           DateTime               @default(now())
   verification_status  VerificationStatus     @default(BELUM_SUBMIT)
   documents            documents[]
@@ -154,15 +156,33 @@ model nilai_scores {
   student students @relation(fields: [student_id], references: [id], onDelete: Cascade)
 }
 
+enum JalurPenerimaan {
+  PILIHAN_1
+  PILIHAN_2
+}
+
+enum StatusAkhirSeleksi {
+  DITERIMA
+  TIDAK_DITERIMA
+}
+
 model student_ranking {
-  id          String   @id @default(cuid())
-  id_student  Int      @unique
-  final_score Float
-  ranking     Int
-  jurusan     Jurusan
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  student     students @relation(fields: [id_student], references: [id], onDelete: Cascade)
+  id                    String              @id @default(cuid())
+  id_student            Int                 @unique
+  final_score           Float
+  nilai_rapor           Float               @default(0)
+  nilai_rata_rata_rapor Float               @default(0)
+  nilai_ujian           Float               @default(0)
+  ranking               Int
+  jurusan               Jurusan
+  jurusan_pilihan_1     Jurusan?
+  jurusan_pilihan_2     Jurusan?
+  jurusan_diterima      Jurusan?
+  jalur_penerimaan      JalurPenerimaan?
+  status_akhir          StatusAkhirSeleksi  @default(TIDAK_DITERIMA)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  student               students            @relation(fields: [id_student], references: [id], onDelete: Cascade)
 
   @@map("student_ranking")
 }
@@ -171,7 +191,9 @@ model student_announcements {
   id         String @id @default(cuid())
   id_student Int    @unique
 
-  status StudentAnnouncementStatus @default(PENDING)
+  status           StudentAnnouncementStatus @default(PENDING)
+  jurusan_diterima Jurusan?
+  jalur_penerimaan JalurPenerimaan?
 
   published_at DateTime?
   is_published Boolean   @default(false)

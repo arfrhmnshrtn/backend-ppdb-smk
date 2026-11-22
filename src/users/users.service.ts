@@ -43,6 +43,9 @@ export class UsersService {
           no_daftar: user.students?.no_daftar || null,
           nama: user.students?.nama || user.name || null,
           jurusan: user.students?.jurusan || null,
+          jurusan_pilihan_1:
+            user.students?.jurusan_pilihan_1 || user.students?.jurusan || null,
+          jurusan_pilihan_2: user.students?.jurusan_pilihan_2 || null,
           no_hp: user.students?.no_hp || user.no_hp || null,
           nisn: user.students?.nisn || null,
           asal_sekolah: user.students?.asal_sekolah || null,
