@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   InternalServerErrorException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../lib/prisma.service';
 import { VerificationStatus } from '../../generated/prisma/client';
@@ -208,9 +209,17 @@ export class CardsService {
 
   /**
    * Membuat jadwal test baru.
+   * Jika jadwal sudah ada di database, tolak pembuatan jadwal baru.
    */
   async createTestSchedule(dto: CreateTestScheduleDto) {
     try {
+      const existingSchedule = await this.prisma.test_schedules.findFirst();
+      if (existingSchedule) {
+        throw new ConflictException(
+          'Jadwal test sudah tersedia. Silakan hapus jadwal yang ada terlebih dahulu jika ingin membuat jadwal baru.',
+        );
+      }
+
       const schedule = await this.prisma.test_schedules.create({
         data: {
           tanggal_test: new Date(dto.tanggal_test),
@@ -319,13 +328,35 @@ export class CardsService {
   }
 
   /**
+   * Menghapus seluruh jadwal test yang aktif.
+   */
+  async removeAllTestSchedules() {
+    try {
+      const count = await this.prisma.test_schedules.count();
+      if (count === 0) {
+        throw new NotFoundException('Tidak ada jadwal test untuk dihapus');
+      }
+
+      await this.prisma.test_schedules.deleteMany({});
+
+      return {
+        success: true,
+        message: 'Jadwal test berhasil dihapus',
+      };
+    } catch (error) {
+      this.handleException(error, 'Gagal menghapus jadwal test');
+    }
+  }
+
+  /**
    * Reusable exception handler.
    */
   private handleException(error: unknown, defaultMessage: string): never {
     if (
       error instanceof NotFoundException ||
       error instanceof ForbiddenException ||
-      error instanceof ConflictException
+      error instanceof ConflictException ||
+      error instanceof BadRequestException
     ) {
       throw error;
     }

@@ -109,4 +109,14 @@ export class CardsController {
   removeTestSchedule(@Param('id', ParseIntPipe) id: number) {
     return this.cardsService.removeTestSchedule(id);
   }
+
+  /**
+   * DELETE /cards/test-schedules
+   * Menghapus jadwal test yang ada.
+   */
+  @Delete('test-schedules')
+  @Roles(user_role.ADMIN)
+  removeAllTestSchedules() {
+    return this.cardsService.removeAllTestSchedules();
+  }
 }
